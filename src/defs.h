@@ -94,6 +94,7 @@ uint32_t garbage;
 #define MAX_STR                2048
 #define REFERENCE              1
 #define TARGET                 0
+#define DEF_EXPLANATION        0
 
 #define SIZE_BITS              46
 #define LENGTH_BITS            46

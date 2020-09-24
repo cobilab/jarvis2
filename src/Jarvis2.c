@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
-//                    J A R V I S   2 0 1 4 - 2 0 1 9                       //
+//                    J A R V I S 2    2 0 1 4 - 2 0 2 1                    //
 //                                                                          //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -497,8 +497,13 @@ int main(int argc, char **argv){
     return EXIT_SUCCESS;
     }
 
-  if(ArgState(DEF_VERSION, p, argc, "-V")){
+  if(ArgState(DEF_VERSION, p, argc, "-a")){
     PrintVersion();
+    return EXIT_SUCCESS;
+    }
+
+  if(ArgState(DEF_EXPLANATION, p, argc, "-x")){
+    ModelsExplanation();
     return EXIT_SUCCESS;
     }
 

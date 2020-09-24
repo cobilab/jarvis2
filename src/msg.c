@@ -103,7 +103,7 @@ void PrintMenu(void){
   "                                                                   \n"
   "NAME                                                               \n"
   "      JARVIS2 v%u.%u,                                              \n"
-  "      extreme lossless compression of genomic sequences.           \n"
+  "      Efficient lossless compression of genomic sequences          \n"
   "                                                                   \n"
   "AUTHORS                                                            \n"
   "      Diogo Pratas        pratas@ua.pt                             \n"
@@ -113,44 +113,44 @@ void PrintMenu(void){
   "      ./JARVIS2 [OPTION]... [FILE]                                 \n"
   "                                                                   \n"
   "SAMPLE                                                             \n"
-  "      Run Compression         :  ./JARVIS2 -v -l 4 sequence.txt    \n"
-  "      Run Decompression       :  ./JARVIS2 -v -d sequence.txt.jc   \n"
+  "      Run Compression   -> ./JARVIS2 -v -l 4 sequence.txt          \n"
+  "      Run Decompression -> ./JARVIS2 -v -d sequence.txt.jc         \n"
   "                                                                   \n"
   "DESCRIPTION                                                        \n"
-  "      Compress and decompress lossless genomic sequences for       \n"
-  "      storage and analysis purposes.                               \n"
-  "      Measure an upper bound of the sequence entropy.              \n"
+  "      Lossless compression and decompression of genomic            \n"
+  "      sequences for efficient storage and analysis purposes.       \n"
+  "      Measure an upper bound of the sequence complexity.           \n"
   "                                                                   \n"
   "      -h,  --help                                                  \n"
-  "           usage guide (help menu).                                \n"
+  "           Usage guide (help menu).                                \n"
   "                                                                   \n"
-  "      -V,  --version                                               \n"
+  "      -a,  --version                                               \n"
   "           Display program and version information.                \n"
   "                                                                   \n"
-  "      -F,  --force                                                 \n"
-  "           force mode. Overwrites old files.                       \n"
+  "      -x,  --explanation                                           \n"
+  "           Explanation of the context and repeat models.           \n"
+  "                                                                   \n"
+  "      -f,  --force                                                 \n"
+  "           Force mode. Overwrites old files.                       \n"
   "                                                                   \n"
   "      -v,  --verbose                                               \n"
-  "           verbose mode (more information).                        \n"
-  "                                                                   \n"
-  "      -e,  --estimation                                            \n"
-  "           creates [sequence].info with complexity profile.        \n"
-  "                                                                   \n"
-  "      -s,  --show-levels                                           \n"
-  "           show pre-computed compression levels (configured).      \n"
+  "           Verbose mode (more information).                        \n"
   "                                                                   \n",
   VERSION, RELEASE);
 
   #ifdef ESTIMATE
   fprintf(stderr,
   "      -e,  --estimate                                              \n"
-  "           it creates a file with the extension \".iae\" with the  \n"
+  "           It creates a file with the extension \".iae\" with the  \n"
   "           respective information content. If the file is FASTA or \n"
-  "           FASTQ it will only use the \"ACGT\" (genomic) sequence. \n"
-  "                                                                   \n");
+  "           FASTQ it will only use the \"ACGT\" (genomic) sequence. \n");
   #endif
   
   fprintf(stderr,
+  "                                                                   \n"
+  "      -s,  --show-levels                                           \n"
+  "           Show pre-computed compression levels (configured).      \n"
+  "                                                                   \n"
   "      -l [NUMBER],  --level [NUMBER]                               \n"
   "           Compression level (integer).                            \n"
   "           Default level: %u.                                      \n"
@@ -158,9 +158,10 @@ void PrintMenu(void){
   "           resources (RAM & time). Use -s for levels perception.   \n",
   DEFAULT_LEVEL);
 
-  ModelsExplanation();
+  // ModelsExplanation();
 
   fprintf(stderr,
+  "                                                                   \n"
   "      -z [NUMBER],  --selection [NUMBER]                           \n"
   "           Size of the context selection model (integer).          \n"
   "           Default context selection: %u.                          \n"
@@ -174,8 +175,7 @@ void PrintMenu(void){
   "      This is a Free software, under GPLv3. You may redistribute   \n"
   "      copies of it under the terms of the GNU - General Public     \n"
   "      License v3 <http://www.gnu.org/licenses/gpl.html>. There     \n"
-  "      is NOT ANY WARRANTY, to the extent permitted by law.         \n"
-  "                                                                   \n",
+  "      is NOT ANY WARRANTY, to the extent permitted by law.       \n\n",
   DEFAULT_SELECTION);
   }
 
@@ -183,13 +183,17 @@ void PrintMenu(void){
 void PrintVersion(void){
   fprintf(stderr,
   "                                                                   \n"
-  "                          ================                         \n"
-  "                          | JARVIS2 v%u.%u |                       \n"
-  "                          ================                         \n"
+  "           ██ ███████ ███████ ██    ██ ██ ███████ ███████          \n"
+  "           ██ ██   ██ ██   ██ ██    ██ ██ ██           ██          \n"
+  "           ██ ███████ ██████  ██    ██ ██ ███████ ███████          \n"
+  "      ██   ██ ██   ██ ██  ███  ██  ██  ██      ██ ██               \n"
+  "      ███████ ██   ██ ██   ███  ████   ██ ███████ ███████          \n"
+  "                                                                   \n"
+  "                      Version %u, Release %u                       \n"
   "                                                                   \n"
   "Extreme lossless compression and decompression of DNA sequences    \n"
   "                                                                   \n"
-  "Copyright (C) 2014-2019 University of Aveiro. JARVIS2 is a Free    \n"
+  "Copyright (C) 2014-2021 University of Aveiro. JARVIS2 is a Free    \n"
   "software. Copies may redistributed under the terms of the GNU -    \n"
   "General Public License v3 http://www.gnu.org/licenses/gpl.html.    \n"
   "There is NOT ANY WARRANTY, to the extent permitted by law.       \n\n", 
