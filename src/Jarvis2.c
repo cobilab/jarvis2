@@ -270,10 +270,22 @@ void Compress(PARAM *P, char *fn){
 
       CalcDecayment(WM, PM, sym);
       for(r = 0 ; r < P->nCModels ; ++r){
-        UpdateCModelCounter(CM[r], sym, CM[r]->pModelIdx);
-        if(CM[r]->ir != 0){                // REVERSE COMPLEMENTS
+        switch(CM[r]->ir){
+          case 0:
+          UpdateCModelCounter(CM[r], sym, CM[r]->pModelIdx);
+          break;
+          case 1:
+          UpdateCModelCounter(CM[r], sym, CM[r]->pModelIdx);
           irSym = GetPModelIdxIR(SB->buf+SB->idx, CM[r]);
           UpdateCModelCounter(CM[r], irSym, CM[r]->pModelIdxIR);
+          break;
+          case 2:
+          irSym = GetPModelIdxIR(SB->buf+SB->idx, CM[r]);
+          UpdateCModelCounter(CM[r], irSym, CM[r]->pModelIdxIR);
+          break;
+          default:
+          UpdateCModelCounter(CM[r], sym, CM[r]->pModelIdx);
+          break;
           }
         }
       RenormalizeWeights(WM);
@@ -517,10 +529,22 @@ void Decompress(char *fn){
 
       CalcDecayment(WM, PM, sym);
       for(r = 0 ; r < P->nCModels ; ++r){
-        UpdateCModelCounter(CM[r], sym, CM[r]->pModelIdx);
-        if(CM[r]->ir != 0){                // REVERSE COMPLEMENTS
+        switch(CM[r]->ir){
+          case 0:
+          UpdateCModelCounter(CM[r], sym, CM[r]->pModelIdx);
+          break;
+          case 1:
+          UpdateCModelCounter(CM[r], sym, CM[r]->pModelIdx);
           irSym = GetPModelIdxIR(SB->buf+SB->idx, CM[r]);
           UpdateCModelCounter(CM[r], irSym, CM[r]->pModelIdxIR);
+          break;
+          case 2:
+          irSym = GetPModelIdxIR(SB->buf+SB->idx, CM[r]);
+          UpdateCModelCounter(CM[r], irSym, CM[r]->pModelIdxIR);
+          break;
+          default:
+          UpdateCModelCounter(CM[r], sym, CM[r]->pModelIdx);
+          break;
           }
         }
       RenormalizeWeights(WM);
@@ -573,32 +597,35 @@ int main(int argc, char **argv){
   
   P = (PARAM *) Calloc(1, sizeof(PARAM));
 
-  if((P->help = ArgState(DEFAULT_HELP, p, argc, "-h")) == 1 || argc < 2){
+  if((P->help = ArgState(DEFAULT_HELP, p, argc, "-h", "--help")) == 1 || 
+  argc < 2){
     PrintMenu();
     return EXIT_SUCCESS;
     }
 
-  if(ArgState(DEF_VERSION, p, argc, "-a")){
+  if(ArgState(DEF_VERSION, p, argc, "-a", "--version")){
     PrintVersion();
     return EXIT_SUCCESS;
     }
 
-  if(ArgState(DEF_EXPLANATION, p, argc, "-x")){
+  if(ArgState(DEF_EXPLANATION, p, argc, "-x", "--explanation")){
     ModelsExplanation();
     return EXIT_SUCCESS;
     }
 
-  if(ArgState(0, p, argc, "-s")){
+  if(ArgState(0, p, argc, "-s", "--show-levels")){
     PrintLevels();
     return EXIT_SUCCESS;
     }
 
-  P->verbose   = ArgState  (DEFAULT_VERBOSE,    p, argc, "-v" );
-  P->force     = ArgState  (DEFAULT_FORCE,      p, argc, "-f" );
-  P->estim     = ArgState  (0,                  p, argc, "-e" );
-  P->hs        = ArgNumber (DEFAULT_HS,         p, argc, "-hs", 1, 999999);
-  P->lr        = ArgDouble (DEFAULT_LR,         p, argc, "-lr");
-  P->level     = ArgNumber (0,   p, argc, "-l", MIN_LEVEL, MAX_LEVEL);
+  P->verbose   = ArgState  (DEFAULT_VERBOSE, p, argc, "-v",  "--verbose");
+  P->force     = ArgState  (DEFAULT_FORCE,   p, argc, "-f",  "--force");
+  P->estim     = ArgState  (0,               p, argc, "-e",  "--estimate");
+  P->hs        = ArgNumber (DEFAULT_HS,      p, argc, "-hs", "--hidden-size", 
+		 1, 999999);
+  P->lr        = ArgDouble (DEFAULT_LR,      p, argc, "-lr", "--learning-rate");
+  P->level     = ArgNumber (0,               p, argc, "-l",  "--level", 
+		 MIN_LEVEL, MAX_LEVEL);
 
   P->lr = ((int)(P->lr * 65534)) / 65534.0;
   
@@ -658,7 +685,7 @@ int main(int argc, char **argv){
         P->cmodel[k++] = ArgsUniqCModel(xargv[n+1], 0);
     }
 
-  P->mode = ArgState (DEF_MODE,  p, argc, "-d"); // COMPRESS OR DECOMPRESS
+  P->mode = ArgState(DEF_MODE,  p, argc, "-d", "--decompress"); 
   P->tar  = argv[argc-1];
  
   if(!P->mode){

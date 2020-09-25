@@ -80,7 +80,7 @@ uint32_t garbage;
 #define DEFAULT_LEVEL          1
 #define DEFAULT_HS             40
 #define DEFAULT_LR             0.03
-#define MAX_LEVEL              15
+#define MAX_LEVEL              16
 #define MIN_LEVEL              1
 #define MAX_CTX                20
 #define MIN_CTX                1
@@ -107,7 +107,7 @@ uint32_t garbage;
 #define EDITS_BITS             8
 #define E_GAMMA_BITS           16
 #define E_DEN_BITS             16
-#define IR_BITS                1
+#define IR_BITS                8
 #define NRMODELS_BITS          16
 #define MAX_RMODELS_BITS       16
 #define LIMIT_BITS             8

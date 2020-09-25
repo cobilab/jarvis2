@@ -10,10 +10,10 @@
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-uint32_t ArgNumber(uint32_t d, char *a[], uint32_t n, char *s, uint32_t l,
-uint32_t u){
+uint32_t ArgNumber(uint32_t d, char *a[], uint32_t n, char *s, char *s2, 
+uint32_t l, uint32_t u){
   uint32_t x;
-  for( ; --n ; ) if(!strcmp(s, a[n])){
+  for( ; --n ; ) if(!strcmp(s, a[n]) || !strcmp(s2, a[n])){
     if((x = atol(a[n+1])) < l || x > u){
       fprintf(stderr, "[x] Invalid number! Interval: [%u;%u].\n", l, u);
       exit(EXIT_FAILURE);
@@ -25,27 +25,27 @@ uint32_t u){
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-double ArgDouble(double def, char *arg[], uint32_t n, char *str){
+double ArgDouble(double def, char *arg[], uint32_t n, char *str, char *str2){
   for( ; --n ; )
-    if(!strcmp(str, arg[n]))
+    if(!strcmp(str, arg[n]) || !strcmp(str2, arg[n]))
       return atof(arg[n+1]);
   return def;
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-uint8_t ArgState(uint8_t def, char *arg[], uint32_t n, char *str){     
+uint8_t ArgState(uint8_t def, char *arg[], uint32_t n, char *str, char *str2){     
   for( ; --n ; )
-    if(!strcmp(str, arg[n]))
+    if(!strcmp(str, arg[n]) || !strcmp(str2, arg[n]))
       return def == 0 ? 1 : 0;
   return def;
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-char *ArgString(char *def, char *arg[], uint32_t n, char *str){
+char *ArgString(char *def, char *arg[], uint32_t n, char *str, char *str2){
   for( ; --n ; )
-    if(!strcmp(str, arg[n]))
+    if(!strcmp(str, arg[n]) || !strcmp(str2, arg[n]))
       return arg[n+1];
   return def;
   }
@@ -65,7 +65,7 @@ CModelPar ArgsUniqCModel(char *str, uint8_t type){
        gamma  >= 1.0     || gamma  < 0.0     || 
        eGamma >= 1.0     || eGamma < 0.0     ||
        edits  >  256     || eDen   > 50000   ||
-       ir     >  1       ||
+       ir     >  2       ||
        eIr    >  1){
        FailModelScheme();
        exit(1);

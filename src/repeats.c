@@ -92,20 +92,11 @@ int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r){
     idx = 0;
 
   if(r == 0) // REGULAR REPEAT
-    #ifdef REPEATS_RANDOM
     C->RM[m].pos = E->pos[ idx ];
-    #else
-    C->RM[m].pos = E->pos[ 0 ];
-    #endif
   else{ // INVERTED REPEAT
-    #ifdef REPEATS_RANDOM
     if(E->pos[ idx ] <= C->P->ctx+1) 
       return 0;
     C->RM[m].pos = E->pos[ idx ] - C->P->ctx - 1;
-    #else
-    if(E->pos[ 0 ] <= C->P->ctx+1) return 0;
-    C->RM[m].pos = E->pos[ 0 ] - C->P->ctx - 1;
-    #endif
     }
 
   C->RM[m].nHits  = 0;
@@ -131,7 +122,8 @@ void InsertKmerPos(RCLASS *C, uint64_t key, uint32_t pos){
     if(((uint64_t) C->hash->ent[h][n].key | b) == key){
       C->hash->ent[h][n].pos = (uint32_t *) Realloc(C->hash->ent[h][n].pos, 
       (C->hash->ent[h][n].nPos + 1) * sizeof(uint32_t));
-      C->hash->ent[h][n].pos[C->hash->ent[h][n].nPos++] = pos; 
+      C->hash->ent[h][n].pos[C->hash->ent[h][n].nPos] = pos; 
+      C->hash->ent[h][n].nPos++;
       // STORE THE LAST K-MER POSITION
       return;
       }
@@ -230,7 +222,7 @@ void StartMultipleRMs(RCLASS *C, uint8_t *b){
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // COMPUTE AND EXTRACT MIXTURED PROBABILITIES
 //
-void ComputeMixture(RCLASS *C, PMODEL *M, uint8_t *b /*, long *freqs, long *sum*/){
+void ComputeMixture(RCLASS *C, PMODEL *M, uint8_t *b){
   uint32_t r, s; 
   double F[NSYM] = {0,0,0,0};
   
@@ -245,13 +237,6 @@ void ComputeMixture(RCLASS *C, PMODEL *M, uint8_t *b /*, long *freqs, long *sum*
     M->freqs[s] = 1 + (uint32_t)(F[s] * MAXC);
     M->sum += M->freqs[s];
     }
-/*
-  sum = 0;
-  for(s = 0 ; s < NSYM ; ++s){
-    freqs[s] = 1 + F[s];
-    sum += freqs[s];
-    }
-*/    
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

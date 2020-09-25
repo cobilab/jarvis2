@@ -10,7 +10,6 @@
 #define SCACHE           32
 #define NSYM             4
 #define MAXC             65535 //((1<<(sizeof(uint16_t)*8))-1)
-#define REPEATS_RANDOM   1
 #define DEF_MRM          50
 #define DEF_CTX          16
 #define DEF_ALPHA        1
@@ -94,7 +93,7 @@ void      UpdateRM           (RMODEL *, uint8_t *, uint8_t);
 void      RenormWeights      (RCLASS *);
 void      StopRM             (RCLASS *);
 void      StartMultipleRMs   (RCLASS *, uint8_t *);
-void      ComputeMixture     (RCLASS *, PMODEL *, uint8_t * /*, long *, long * */);
+void      ComputeMixture     (RCLASS *, PMODEL *, uint8_t *);
 void      UpdateWeights      (RCLASS *, uint8_t *, uint8_t);
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
