@@ -6,7 +6,7 @@
 #include <inttypes.h>
 #include <unistd.h>
 
-//#define DEBUG 1
+#define DEBUG 1
 #define ESTIMATE 1
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -43,6 +43,8 @@ typedef struct{
   uint8_t   estim;
   uint8_t   level;
   uint8_t   mode;
+  uint32_t  hs;
+  double    lr;
   uint32_t  col;
   uint32_t  nModels;
   uint32_t  nRPModels;
@@ -76,7 +78,8 @@ uint32_t garbage;
 #define DEFAULT_VERBOSE        0
 #define DEFAULT_FORCE          0
 #define DEFAULT_LEVEL          1
-#define DEFAULT_SELECTION      12
+#define DEFAULT_HS             40
+#define DEFAULT_LR             0.03
 #define MAX_LEVEL              15
 #define MIN_LEVEL              1
 #define MAX_CTX                20
@@ -95,7 +98,6 @@ uint32_t garbage;
 #define REFERENCE              1
 #define TARGET                 0
 #define DEF_EXPLANATION        0
-
 #define SIZE_BITS              46
 #define LENGTH_BITS            46
 #define SELECTION_BITS         8
@@ -112,6 +114,8 @@ uint32_t garbage;
 #define ALPHA_BITS             16
 #define BETA_BITS              16
 #define GAMMA_BITS             16
+#define HS_BITS                16
+#define LR_BITS                16
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

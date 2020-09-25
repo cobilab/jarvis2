@@ -94,7 +94,7 @@ void      UpdateRM           (RMODEL *, uint8_t *, uint8_t);
 void      RenormWeights      (RCLASS *);
 void      StopRM             (RCLASS *);
 void      StartMultipleRMs   (RCLASS *, uint8_t *);
-void      ComputeMixture     (RCLASS *, PMODEL *, uint8_t *);
+void      ComputeMixture     (RCLASS *, PMODEL *, uint8_t * /*, long *, long * */);
 void      UpdateWeights      (RCLASS *, uint8_t *, uint8_t);
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

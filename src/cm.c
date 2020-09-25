@@ -82,7 +82,8 @@ uint64_t GetPModelIdxCorr(uint8_t *p, CMODEL *M, uint64_t idx){
  
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void ComputePModel(CMODEL *M, PMODEL *PM, uint64_t idx, uint32_t aDen){
+void ComputePModel(CMODEL *M, PMODEL *PM, uint64_t idx, uint32_t aDen, 
+long *freqs, long *sum){
   ACC *ac;
   HCC *hc;
   uint32_t x;
@@ -96,6 +97,11 @@ void ComputePModel(CMODEL *M, PMODEL *PM, uint64_t idx, uint32_t aDen){
         PM->freqs[x] = 1 + aDen * hc[x];
         PM->sum += PM->freqs[x];
         }
+      sum[0] = 0;
+      for(x = 0 ; x < M->nSym ; ++x){
+        freqs[x] = 1 + hc[x];
+        sum[0] += freqs[x];
+        }
     break;
 
     case ARRAY_MODE:
@@ -105,7 +111,12 @@ void ComputePModel(CMODEL *M, PMODEL *PM, uint64_t idx, uint32_t aDen){
         PM->freqs[x] = 1 + aDen * ac[x];
         PM->sum += PM->freqs[x];
         }
-    break;
+      sum[0] = 0;
+      for(x = 0 ; x < M->nSym ; ++x){
+        freqs[x] = 1 + ac[x];
+        sum[0] += freqs[x];
+        }
+      break;
 
     default:
     fprintf(stderr, "Error: not implemented!\n");

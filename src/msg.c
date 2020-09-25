@@ -162,9 +162,13 @@ void PrintMenu(void){
 
   fprintf(stderr,
   "                                                                   \n"
-  "      -z [NUMBER],  --selection [NUMBER]                           \n"
-  "           Size of the context selection model (integer).          \n"
-  "           Default context selection: %u.                          \n"
+  "      -hs [NUMBER],  --hidden-size [NUMBER]                        \n"
+  "           Hidden size of the neural network (integer).            \n"
+  "           Default value: %u.                                      \n"
+  "                                                                   \n"
+  "      -lr [DOUBLE],  --learning-rate [DOUBLE]                      \n"
+  "           Neural Network leaning rate (double).                   \n"
+  "           Default value: %lf.                                     \n"
   "                                                                   \n"
   "      [FILE]                                                       \n"
   "           Input sequence filename (to compress) -- MANDATORY.     \n"
@@ -176,7 +180,7 @@ void PrintMenu(void){
   "      copies of it under the terms of the GNU - General Public     \n"
   "      License v3 <http://www.gnu.org/licenses/gpl.html>. There     \n"
   "      is NOT ANY WARRANTY, to the extent permitted by law.       \n\n",
-  DEFAULT_SELECTION);
+  DEFAULT_HS, DEFAULT_LR);
   }
 
 

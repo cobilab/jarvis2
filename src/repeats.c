@@ -230,7 +230,7 @@ void StartMultipleRMs(RCLASS *C, uint8_t *b){
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // COMPUTE AND EXTRACT MIXTURED PROBABILITIES
 //
-void ComputeMixture(RCLASS *C, PMODEL *M, uint8_t *b){
+void ComputeMixture(RCLASS *C, PMODEL *M, uint8_t *b /*, long *freqs, long *sum*/){
   uint32_t r, s; 
   double F[NSYM] = {0,0,0,0};
   
@@ -245,6 +245,13 @@ void ComputeMixture(RCLASS *C, PMODEL *M, uint8_t *b){
     M->freqs[s] = 1 + (uint32_t)(F[s] * MAXC);
     M->sum += M->freqs[s];
     }
+/*
+  sum = 0;
+  for(s = 0 ; s < NSYM ; ++s){
+    freqs[s] = 1 + F[s];
+    sum += freqs[s];
+    }
+*/    
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

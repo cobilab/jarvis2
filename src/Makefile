@@ -3,16 +3,16 @@
 #============================================================================#
 BIN    = .
 CC     = gcc
-CPLP   = -ffast-math -msse2
+CPLP   = 
 #-----------------------------------------------------------------------------
-CFLAGS = -O3 -Wall $(CPLP) -DPROGRESS
+CFLAGS = -Wall -O3 -march=native -mtune=native $(CPLP) -DPROGRESS
 #-----------------------------------------------------------------------------
 LIBS   = -lm
 DEPS   = defs.h
 PROGS  = $(BIN)/JARVIS2
 OBJS   = bitio.o arith.o arith_aux.o levels.o common.o msg.o mem.o dna.o \
-         files.o strings.o args.o repeats.o pmodels.o buffer.o cm_tolerant.o \
-         cm_array.o cm_hash.o cm.o
+         files.o strings.o args.o nn.o mix.o repeats.o pmodels.o buffer.o \
+	 cm_tolerant.o cm_array.o cm_hash.o cm.o
 #-----------------------------------------------------------------------------
 all:
 	$(MAKE) progs
@@ -43,6 +43,10 @@ buffer.o: buffer.c buffer.h
 	$(CC) -c $(CFLAGS) buffer.c
 args.o: args.c args.h
 	$(CC) -c $(CFLAGS) args.c
+mix.o: mix.c mix.h
+	$(CC) -c $(CFLAGS) mix.c
+nn.o: nn.c nn.h
+	$(CC) -c $(CFLAGS) nn.c
 repeats.o: repeats.c repeats.h
 	$(CC) -c $(CFLAGS) repeats.c
 pmodels.o: pmodels.c pmodels.h
