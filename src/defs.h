@@ -77,7 +77,7 @@ uint32_t garbage;
 #define DEFAULT_HELP           0
 #define DEFAULT_VERBOSE        0
 #define DEFAULT_FORCE          0
-#define DEFAULT_LEVEL          1
+#define DEFAULT_LEVEL          4
 #define DEFAULT_HS             40
 #define DEFAULT_LR             0.03
 #define MAX_LEVEL              16

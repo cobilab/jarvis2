@@ -7,6 +7,20 @@
 #include "mem.h"
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// FAST HASH
+//
+uint64_t FHASH(uint64_t z){
+  z = (~z) + (z << 21);
+  z = z    ^ (z >> 24);
+  z = (z   + (z << 3)) + (z << 8);
+  z = z    ^ (z >> 14);
+  z = (z   + (z << 2)) + (z << 4);
+  z = z    ^ (z >> 28);
+  z = z    + (z << 31);
+  return z;
+  }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // SHIFT BUFFER TO RIGHT. PERHAPS A CIRCULAR BUFFER IS A BETTER APPROACH...
 //
 void ShiftRBuf(uint8_t *b, uint32_t s, uint8_t n){
@@ -115,11 +129,17 @@ int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r){
 //
 void InsertKmerPos(RCLASS *C, uint64_t key, uint32_t pos){
 
-  uint32_t n, h = (uint32_t) key % HSIZE;
+  uint32_t n, h = (uint32_t) (key % HSIZE);
   uint64_t b = key & 0xfffffff0000;
  
   for(n = 0 ; n < C->hash->size[h] ; ++n)
     if(((uint64_t) C->hash->ent[h][n].key | b) == key){
+
+      if(C->hash->ent[h][n].nPos == 255){  // PROTECTION FOR 8BITS
+        C->hash->ent[h][n].nPos = 0;
+	return;
+        }
+
       C->hash->ent[h][n].pos = (uint32_t *) Realloc(C->hash->ent[h][n].pos, 
       (C->hash->ent[h][n].nPos + 1) * sizeof(uint32_t));
       C->hash->ent[h][n].pos[C->hash->ent[h][n].nPos] = pos; 

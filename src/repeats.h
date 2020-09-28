@@ -25,7 +25,7 @@
 
 typedef struct{
   uint16_t key;      // THE KEY (INDEX / HASHSIZE) STORED IN THIS RENTRY
-  uint16_t nPos;     // NUMBER OF POSITIONS FOR THIS RENTRY
+  uint8_t  nPos;     // NUMBER OF POSITIONS FOR THIS RENTRY
   uint32_t *pos;     // THE LAST (NEAREST) REPEATING POSITION
   }
 RENTRY;
