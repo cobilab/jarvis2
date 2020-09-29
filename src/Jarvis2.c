@@ -110,14 +110,14 @@ void Compress(PARAM *P, char *fn){
   uint64_t  i = 0, mSize = MAX_BUF, pos = 0, r = 0;
   uint32_t  m, n, q, j, c;
   uint8_t   t[NSYM], *buf   = (uint8_t *) Calloc(mSize,    sizeof(uint8_t)), 
-            sym = 0, *cache = (uint8_t *) Calloc(SCACHE+1, sizeof(uint8_t)),
+            sym = 0, *cache = (uint8_t *) Calloc(SCACHE+2, sizeof(uint8_t)),
             *p, irSym;
 
   RCLASS    **RC;
   CMODEL    **CM;
   PMODEL    **PM;
   PMODEL    *MX_CM;
-  PMODEL    *MX_RM;
+  PMODEL    **MX_RM;
   FPMODEL   *PT;
   CMWEIGHT  *WM;
   CBUF      *SB;
@@ -162,7 +162,9 @@ void Compress(PARAM *P, char *fn){
   PM      = (PMODEL **) Calloc(P->nCPModels, sizeof(PMODEL *));
   for(n = 0 ; n < P->nCPModels ; ++n)
     PM[n] = CreatePModel(NSYM);
-  MX_RM   = CreatePModel(NSYM);
+  MX_RM   = (PMODEL **) Calloc(P->nRModels, sizeof(PMODEL *));
+  for(n = 0 ; n < P->nRModels ; ++n)
+    MX_RM[n] = CreatePModel(NSYM);
   MX_CM   = CreatePModel(NSYM);
   PT      = CreateFloatPModel(NSYM);
   WM      = CreateWeightModel(P->nCPModels);
@@ -229,21 +231,27 @@ void Compress(PARAM *P, char *fn){
       for(r = 0 ; r < P->nRModels ; ++r){             // FOR ALL REPEAT MODELS
         StopRM           (RC[r]);
         StartMultipleRMs (RC[r], cache+SCACHE-1);
+        //StartMultipleRMs (RC[r], p);
         InsertKmerPos    (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
+        //if(RC[r]->P.c_r_idx > RC[r]->r_max)
         RenormWeights    (RC[r]);
-        ComputeMixture   (RC[r], MX_RM, buf /*, freqs[c], &sums[c]*/ );
-        }
-  
-      // PASS MX_RM AS LAST MODEL AND SET IT AS PM[c]
-      for(j = c ; j < c + P->nRModels ; ++j){             // FOR ALL REPEAT MODELS
+        ComputeMixture   (RC[r], MX_RM[r], buf);
+//	fprintf(stderr, "%"PRIu64" %lu : %"PRIu64":%"PRIu64"\n", pos, r,  RC[r]->P->idx, CM[0]->pModelIdx);
+//	fprintf(stderr, "%d : %s\n", sym, cache);
+	}
+
+      // PASS MX_RM[q] AS LAST MODEL AND SET IT AS PM[c]
+      for(j = c, q = 0 ; j < c + P->nRModels ; ++j, ++q){ // FOR * REPEAT MODELS
         PM[j]->sum = 0;
         for(r = 0 ; r < NSYM ; ++r){
-          PM[j]->freqs[r] = MX_RM->freqs[r];
+          PM[j]->freqs[r] = MX_RM[q]->freqs[r];
 	  freqs[c][r] = PM[j]->freqs[r];
 	  }
-	sums[c] = MX_RM->sum;
-        PM[j]->sum = MX_RM->sum;
+	sums[c] = MX_RM[q]->sum;
+        PM[j]->sum = MX_RM[q]->sum;
         ComputeWeightedFreqs(WM->weight[j], PM[j], PT, NSYM);
+	
+       // fprintf(stderr, "RC[%u] -> %.4lf\n", q, WM->weight[j]);
         }
             
       // FILL PROBABILITIES FOR ALL MODELS FOR NEURAL NETWORK
@@ -346,14 +354,14 @@ void Decompress(char *fn){
   uint64_t i = 0, mSize = MAX_BUF, pos = 0;
   uint32_t m, n, j, q, r, c;
   uint8_t  *buf   = (uint8_t *) Calloc(mSize,    sizeof(uint8_t)),
-           *cache = (uint8_t *) Calloc(SCACHE+1, sizeof(uint8_t)), 
+           *cache = (uint8_t *) Calloc(SCACHE+2, sizeof(uint8_t)), 
            sym = 0, *p, irSym;
   RCLASS   **RC = NULL; 
   CMODEL   **CM = NULL;
   PARAM    *P = (PARAM *) Calloc(1, sizeof(PARAM));
   PMODEL   **PM;
   PMODEL   *MX_CM;
-  PMODEL   *MX_RM;
+  PMODEL   **MX_RM;
   FPMODEL  *PT;
   CMWEIGHT *WM;
   CBUF     *SB;
@@ -435,7 +443,9 @@ void Decompress(char *fn){
   PM      = (PMODEL **) Calloc(P->nCPModels, sizeof(PMODEL *));
   for(n = 0 ; n < P->nCPModels ; ++n)
     PM[n] = CreatePModel(NSYM);
-  MX_RM   = CreatePModel(NSYM);
+  MX_RM   = (PMODEL **) Calloc(P->nRModels, sizeof(PMODEL *));
+  for(n = 0 ; n < P->nRModels ; ++n)
+    MX_RM[n] = CreatePModel(NSYM);
   MX_CM   = CreatePModel(NSYM);
   PT      = CreateFloatPModel(NSYM);
   WM      = CreateWeightModel(P->nCPModels);
@@ -486,18 +496,18 @@ void Decompress(char *fn){
         StartMultipleRMs (RC[r], cache+SCACHE-1);
         InsertKmerPos    (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
         RenormWeights    (RC[r]);
-        ComputeMixture   (RC[r], MX_RM, buf);
+        ComputeMixture   (RC[r], MX_RM[r], buf);
         }
 
       // PASS MX_RM AS LAST MODEL AND SET IT AS PM[c]
-      for(j = c ; j < c + P->nRModels ; ++j){  // FOR ALL REPEAT MODELS
+      for(j = c, q = 0 ; j < c + P->nRModels ; ++j, ++q){  // FOR ALL REPEAT MODELS
         PM[j]->sum = 0;
         for(r = 0 ; r < NSYM ; ++r){
-          PM[j]->freqs[r] = MX_RM->freqs[r];
+          PM[j]->freqs[r] = MX_RM[q]->freqs[r];
 	  freqs[c][r] = PM[j]->freqs[r];
 	  }
-	sums[c] = MX_RM->sum;
-        PM[j]->sum = MX_RM->sum;
+	sums[c] = MX_RM[q]->sum;
+        PM[j]->sum = MX_RM[q]->sum;
         ComputeWeightedFreqs(WM->weight[j], PM[j], PT, NSYM);
         }
 

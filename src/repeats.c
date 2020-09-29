@@ -23,8 +23,8 @@ uint64_t FHASH(uint64_t z){
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // SHIFT BUFFER TO RIGHT. PERHAPS A CIRCULAR BUFFER IS A BETTER APPROACH...
 //
-void ShiftRBuf(uint8_t *b, uint32_t s, uint8_t n){
-  memmove(b, b+1, s*sizeof(uint8_t));
+void ShiftRBuf(uint8_t *b, int32_t s, uint8_t n){
+  memmove(b, b+1, s * sizeof(uint8_t));
   b[s-1] = n;
   }
 
@@ -41,22 +41,27 @@ uint8_t GetNBase(uint8_t *b, uint64_t i){
 //
 RCLASS *CreateRC(uint32_t m, double a, double b, uint32_t l, uint32_t c,
 double g, uint8_t i){
-  RCLASS *C     = (RCLASS   *) Calloc(1,     sizeof(RCLASS  ));
-  C->hash       = (RHASH    *) Calloc(1,     sizeof(RHASH   ));
-  C->P          = (RPARAM   *) Calloc(1,     sizeof(RPARAM  ));
-  C->hash->ent  = (RENTRY  **) Calloc(HSIZE, sizeof(RENTRY *));
-  C->hash->size = (uint32_t *) Calloc(HSIZE, sizeof(uint32_t));
-  C->RM         = (RMODEL   *) Calloc(m,     sizeof(RMODEL  ));
-  C->mRM        = m;
-  C->P->rev     = i;
-  C->P->alpha   = ((int)(a*65534))/65534.0;
-  C->P->beta    = ((int)(b*65534))/65534.0;
-  C->P->gamma   = ((int)(g*65534))/65534.0;
-  C->P->limit   = l;
-  C->P->ctx     = c;
-  C->P->mult    = CalcMult(c);
-  C->P->idx     = 0;
-  C->P->idxRev  = 0;
+  RCLASS *C      = (RCLASS   *) Calloc(1,     sizeof(RCLASS  ));
+  C->hash        = (RHASH    *) Calloc(1,     sizeof(RHASH   ));
+  C->P           = (RPARAM   *) Calloc(1,     sizeof(RPARAM  ));
+  C->hash->ent   = (RENTRY  **) Calloc(HSIZE, sizeof(RENTRY *));
+  C->hash->size  = (uint32_t *) Calloc(HSIZE, sizeof(uint32_t));
+  C->RM          = (RMODEL   *) Calloc(m,     sizeof(RMODEL  ));
+  C->mRM         = m;
+  C->P->rev      = i;
+  C->P->alpha    = ((int)(a*65534))/65534.0;
+  C->P->beta     = ((int)(b*65534))/65534.0;
+  C->P->gamma    = ((int)(g*65534))/65534.0;
+  C->P->limit    = l;
+  C->P->ctx      = c;
+  C->P->mult     = CalcMult(c);
+  C->P->idx      = 0;
+  C->P->idxRev   = 0;
+  C->P->c_pos    = 0;
+  C->P->c_max    = 10000000;
+  C->P->c_idx    = 0;
+  C->P->c_idxRev = 0;
+
   return C;
   }
 
@@ -122,6 +127,53 @@ int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r){
     C->RM[m].probs[s] = 0;
 
   return 1;
+  }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// REMOVE KMER POSITION OF RHASH TABLE
+//
+void RemoveKmerPos(RCLASS *C, uint64_t key, uint32_t pos){
+
+  uint32_t n, x, h = (uint32_t) (key % HSIZE);
+  uint64_t b = key & 0xfffffff0000;
+
+  for(n = 0 ; n < C->hash->size[h] ; ++n)
+    if(((uint64_t) C->hash->ent[h][n].key | b) == key){
+
+      if(C->hash->ent[h][n].nPos == 0){
+	fprintf(stderr, "Error: removing kmer exception found!\n");
+	fprintf(stderr, "Error: kmer was never been inserted in RHASH!\n");
+        exit(1);
+        }
+
+      if(C->hash->ent[h][n].nPos == 1){
+	C->hash->ent[h][n].nPos = 0;
+        Free(C->hash->ent[h][n].pos);
+	return;
+	}
+
+      for(x = 0 ; x < C->hash->ent[h][n].nPos ; ++x){
+        if(C->hash->ent[h][n].pos[x] == pos){
+          uint32_t y;
+	  if(x == 0){
+            C->hash->ent[h][n].pos[0] = C->hash->ent[h][n].pos[1];
+	    }
+	  else{
+            for(y = x ; y < C->hash->ent[h][n].nPos ; ++y){
+              C->hash->ent[h][n].pos[y-1] = C->hash->ent[h][n].pos[y];    
+	      }	  
+            }
+          }
+        }
+	      
+      C->hash->ent[h][n].nPos--;
+      C->hash->ent[h][n].pos = (uint32_t *) Realloc(C->hash->ent[h][n].pos,
+      (C->hash->ent[h][n].nPos) * sizeof(uint32_t));
+
+      return;
+      }
+
+  return;
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -231,12 +283,18 @@ void StopRM(RCLASS *C){
 // START NEW REPEAT MODELS IF THERE IS STILL SPACE
 //                         
 void StartMultipleRMs(RCLASS *C, uint8_t *b){
-  if(C->nRM < C->mRM && StartRM(C, C->nRM, GetIdx(b, C), 0))
-    C->nRM++;
+  
+  if(C->P->rev != 2){
+    uint64_t idx = GetIdx(b, C);
+    if(C->nRM < C->mRM && StartRM(C, C->nRM, idx, 0))
+      C->nRM++;
+    }
 
-  if(C->P->rev == 1 && C->nRM < C->mRM && StartRM(C, C->nRM, 
-  GetIdxRev(b, C), 1))
-    C->nRM++;
+  if(C->P->rev != 0){
+    uint64_t idx_rev = GetIdxRev(b, C);
+    if(C->nRM < C->mRM && StartRM(C, C->nRM, idx_rev, 1))
+      C->nRM++;
+    }
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

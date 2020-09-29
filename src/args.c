@@ -106,7 +106,7 @@ RModelPar ArgsUniqRModel(char *str, uint8_t type){
        beta   >= 1       || beta   <= 0       ||
        limit  >  21      || limit  <= 0       ||
        gamma  >= 1       || gamma  <= 0       ||
-       ir     >  1){
+       ir     >  2){
        FailModelScheme();
        exit(1);
        }
@@ -131,6 +131,16 @@ RModelPar ArgsUniqRModel(char *str, uint8_t type){
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+void InvName(int ir){
+  switch(ir){
+    case 0: fprintf(stderr, "regular only\n"); break;
+    case 1: fprintf(stderr, "regular and inversions\n"); break;
+    case 2: fprintf(stderr, "inversions only\n"); break;
+    }
+  }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 void PrintArgs(PARAM *P){
   uint32_t n = 0;
 
@@ -149,8 +159,8 @@ void PrintArgs(PARAM *P){
     1.0 / P->cmodel[n].den);
     fprintf(stderr, "  [+] Gamma ........................ %.3lf\n", 
     P->cmodel[n].gamma);
-    fprintf(stderr, "  [+] Using inversions ............. %s\n",
-    P->cmodel[n].ir == 1 ? "yes" : "no"); 
+    fprintf(stderr, "  [+] Using inversions ............. ");
+    InvName(P->cmodel[n].ir);
     if(P->cmodel[n].edits > 0){
       fprintf(stderr, "Substitutional tolerant context model:\n");
       fprintf(stderr, "  [+] Context order (depth) ........ %u\n",
@@ -161,8 +171,8 @@ void PrintArgs(PARAM *P){
       1.0 / P->cmodel[n].eDen);
       fprintf(stderr, "  [+] Gamma ........................ %.3lf\n",
       P->cmodel[n].eGamma);
-      fprintf(stderr, "  [+] Using inversions ............. %s\n",                    
-      P->cmodel[n].eIr == 1 ? "yes" : "no");
+      fprintf(stderr, "  [+] Using inversions ............. ");                   
+      InvName(P->cmodel[n].eIr);
       }
     }
 
@@ -180,8 +190,8 @@ void PrintArgs(PARAM *P){
     P->rmodel[n].gamma);
     fprintf(stderr, "  [+] Limit ........................ %u\n",
     P->rmodel[n].limit);
-    fprintf(stderr, "  [+] Using inversions ............. %s\n",
-    P->rmodel[n].ir == 1 ? "yes" : "no");
+    fprintf(stderr, "  [+] Using inversions ............. ");
+    InvName(P->rmodel[n].ir);
     }
 
   fprintf(stderr, "Target file ........................ %s\n", P->tar); 
