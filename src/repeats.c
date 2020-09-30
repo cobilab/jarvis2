@@ -40,13 +40,14 @@ uint8_t GetNBase(uint8_t *b, uint64_t i){
 // CREATES THE RCLASS BASIC STRUCTURE 
 //
 RCLASS *CreateRC(uint32_t m, double a, double b, uint32_t l, uint32_t c,
-double g, uint8_t i){
+double g, uint8_t i, double w){
   RCLASS *C      = (RCLASS   *) Calloc(1,     sizeof(RCLASS  ));
   C->hash        = (RHASH    *) Calloc(1,     sizeof(RHASH   ));
   C->P           = (RPARAM   *) Calloc(1,     sizeof(RPARAM  ));
   C->hash->ent   = (RENTRY  **) Calloc(HSIZE, sizeof(RENTRY *));
   C->hash->size  = (uint32_t *) Calloc(HSIZE, sizeof(uint32_t));
   C->RM          = (RMODEL   *) Calloc(m,     sizeof(RMODEL  ));
+  C->hash->max_c = MAX_HASH_COL;
   C->mRM         = m;
   C->P->rev      = i;
   C->P->alpha    = ((int)(a*65534))/65534.0;
@@ -61,6 +62,7 @@ double g, uint8_t i){
   C->P->c_max    = 10000000;
   C->P->c_idx    = 0;
   C->P->c_idxRev = 0;
+  C->P->iWeight  = w;
 
   return C;
   }
@@ -80,15 +82,29 @@ uint64_t GetIdx(uint8_t *p, RCLASS *C){
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// THRESHOLD REVERSE COMPLEMENT INDEX BASED ON PAST SYMBOLS
+//
+uint64_t GetTIdxRev(uint8_t *p, RCLASS *C){
+  return (C->P->c_idxRev = (C->P->c_idxRev>>2)+CompNum(*p)*C->P->mult);
+  }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// THRESHOLD INDEX CALC BASED ON PAST SYMBOLS
+//
+uint64_t GetTIdx(uint8_t *p, RCLASS *C){
+  return (C->P->c_idx = ((C->P->c_idx-*(p-C->P->ctx)*C->P->mult)<<2)+*p);
+  }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // GET REPEAT MODEL RHASH RENTRY
 //
 RENTRY *GetHEnt(RCLASS *C, uint64_t key){
 
-  uint32_t n, h = (uint32_t) (key % HSIZE);
-  uint64_t b = (uint64_t) key & 0xfffffff0000;
+  uint32_t n, h = (FHASH(key) % HSIZE);
+  uint16_t b = key & 0xffff;
 
   for(n = 0 ; n < C->hash->size[h] ; ++n)
-    if(((uint64_t) C->hash->ent[h][n].key | b) == key)
+    if(C->hash->ent[h][n].key == b)
       return &C->hash->ent[h][n];
 
   return NULL;
@@ -122,7 +138,7 @@ int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r){
   C->RM[m].nTries = 0;
   C->RM[m].rev    = r;
   C->RM[m].acting = 0;
-  C->RM[m].weight = INIWEIGHT;
+  C->RM[m].weight = C->P->iWeight;
   for(s = 0 ; s < NSYM ; ++s)
     C->RM[m].probs[s] = 0;
 
@@ -132,13 +148,15 @@ int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r){
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // REMOVE KMER POSITION OF RHASH TABLE
 //
-void RemoveKmerPos(RCLASS *C, uint64_t key, uint32_t pos){
+void RemoveKmerPos(RCLASS *C, uint8_t *block){
 
-  uint32_t n, x, h = (uint32_t) (key % HSIZE);
-  uint64_t b = key & 0xfffffff0000;
+  uint64_t key = GetTIdx(block, C);
+
+  uint32_t n, x, h = (FHASH(key) % HSIZE);
+  uint16_t b = key & 0xffff;
 
   for(n = 0 ; n < C->hash->size[h] ; ++n)
-    if(((uint64_t) C->hash->ent[h][n].key | b) == key){
+    if(C->hash->ent[h][n].key == b){
 
       if(C->hash->ent[h][n].nPos == 0){
 	fprintf(stderr, "Error: removing kmer exception found!\n");
@@ -146,24 +164,14 @@ void RemoveKmerPos(RCLASS *C, uint64_t key, uint32_t pos){
         exit(1);
         }
 
-      if(C->hash->ent[h][n].nPos == 1){
+      if(C->hash->ent[h][n].nPos <= 1){
 	C->hash->ent[h][n].nPos = 0;
         Free(C->hash->ent[h][n].pos);
 	return;
 	}
-
-      for(x = 0 ; x < C->hash->ent[h][n].nPos ; ++x){
-        if(C->hash->ent[h][n].pos[x] == pos){
-          uint32_t y;
-	  if(x == 0){
-            C->hash->ent[h][n].pos[0] = C->hash->ent[h][n].pos[1];
-	    }
-	  else{
-            for(y = x ; y < C->hash->ent[h][n].nPos ; ++y){
-              C->hash->ent[h][n].pos[y-1] = C->hash->ent[h][n].pos[y];    
-	      }	  
-            }
-          }
+      else{
+	for(x = C->hash->ent[h][n].nPos - 1 ; x > 0 ; x--)
+          C->hash->ent[h][n].pos[x-1] = C->hash->ent[h][n].pos[x];    
         }
 	      
       C->hash->ent[h][n].nPos--;
@@ -181,13 +189,13 @@ void RemoveKmerPos(RCLASS *C, uint64_t key, uint32_t pos){
 //
 void InsertKmerPos(RCLASS *C, uint64_t key, uint32_t pos){
 
-  uint32_t n, h = (uint32_t) (key % HSIZE);
-  uint64_t b = key & 0xfffffff0000;
- 
-  for(n = 0 ; n < C->hash->size[h] ; ++n)
-    if(((uint64_t) C->hash->ent[h][n].key | b) == key){
+  uint32_t n, h = (FHASH(key) % HSIZE);
+  uint16_t b = key & 0xffff;
 
-      if(C->hash->ent[h][n].nPos == 255){  // PROTECTION FOR 8BITS
+  for(n = 0 ; n < C->hash->size[h] ; ++n)
+    if(C->hash->ent[h][n].key == b){
+
+      if(C->hash->ent[h][n].nPos == C->hash->max_c){  // PROTECTION FOR MAX BITS
         C->hash->ent[h][n].nPos = 0;
 	return;
         }
@@ -206,7 +214,7 @@ void InsertKmerPos(RCLASS *C, uint64_t key, uint32_t pos){
   
   // CREATE A NEW POSITION
   C->hash->ent[h][C->hash->size[h]].pos    = (uint32_t *) Calloc(1, 
-                                             sizeof(uint32_t));
+		                             sizeof(uint32_t));
   C->hash->ent[h][C->hash->size[h]].nPos   = 1;
   C->hash->ent[h][C->hash->size[h]].pos[0] = pos;
   C->hash->ent[h][C->hash->size[h]].key    = (uint16_t) (key & 0xffff);

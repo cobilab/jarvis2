@@ -39,34 +39,35 @@
 void EncodeHeader(PARAM *P, RCLASS **RC, CMODEL **CM, FILE *F){
   uint32_t n;
 
-  WriteNBits(P->size,                                  SIZE_BITS, F);
-  WriteNBits(P->length,                              LENGTH_BITS, F);
-  WriteNBits(P->hs,                                      HS_BITS, F);
-  WriteNBits((uint16_t)(P->lr * 65534),                  LR_BITS, F);
-  WriteNBits(P->nCModels,                          NCMODELS_BITS, F);
+  WriteNBits(P->size,                                   SIZE_BITS, F);
+  WriteNBits(P->length,                               LENGTH_BITS, F);
+  WriteNBits(P->hs,                                       HS_BITS, F);
+  WriteNBits((uint16_t)(P->lr * 65534),                   LR_BITS, F);
+  WriteNBits(P->nCModels,                           NCMODELS_BITS, F);
   for(n = 0 ; n < P->nCModels ; ++n){
-    WriteNBits(CM[n]->ctx,                              CTX_BITS, F);
-    WriteNBits(CM[n]->alphaDen,                   ALPHA_DEN_BITS, F);
-    WriteNBits((int)(CM[n]->gamma * 65534),           GAMMA_BITS, F);
-    WriteNBits(CM[n]->ir,                                IR_BITS, F);
-    WriteNBits(CM[n]->edits,                          EDITS_BITS, F);
+    WriteNBits(CM[n]->ctx,                               CTX_BITS, F);
+    WriteNBits(CM[n]->alphaDen,                    ALPHA_DEN_BITS, F);
+    WriteNBits((int)(CM[n]->gamma * 65534),            GAMMA_BITS, F);
+    WriteNBits(CM[n]->ir,                                 IR_BITS, F);
+    WriteNBits(CM[n]->edits,                           EDITS_BITS, F);
     if(CM[n]->edits != 0){
-      WriteNBits((int)(CM[n]->eGamma * 65534),      E_GAMMA_BITS, F);
-      WriteNBits(CM[n]->TM->den,                      E_DEN_BITS, F);
-      WriteNBits(CM[n]->TM->ir,                          IR_BITS, F);
+      WriteNBits((int)(CM[n]->eGamma * 65534),       E_GAMMA_BITS, F);
+      WriteNBits(CM[n]->TM->den,                       E_DEN_BITS, F);
+      WriteNBits(CM[n]->TM->ir,                           IR_BITS, F);
       }
     }
-  WriteNBits(P->nCPModels,                         NCMODELS_BITS, F);
-  WriteNBits(P->nRModels,                          NRMODELS_BITS, F);
+  WriteNBits(P->nCPModels,                          NCMODELS_BITS, F);
+  WriteNBits(P->nRModels,                           NRMODELS_BITS, F);
   for(n = 0 ; n < P->nRModels ; ++n){
-    WriteNBits(RC[n]->mRM,                      MAX_RMODELS_BITS, F);
-    WriteNBits((uint16_t)(RC[n]->P->alpha * 65534),   ALPHA_BITS, F);
-    WriteNBits((uint16_t)(RC[n]->P->beta  * 65534),    BETA_BITS, F);
-    WriteNBits((uint16_t)(RC[n]->P->gamma * 65534),   GAMMA_BITS, F);
-    WriteNBits(RC[n]->P->limit,                       LIMIT_BITS, F);
-    WriteNBits(RC[n]->P->ctx,                           CTX_BITS, F);
-    WriteNBits(RC[n]->P->rev,                            IR_BITS, F);
-    }
+    WriteNBits(RC[n]->mRM,                       MAX_RMODELS_BITS, F);
+    WriteNBits((uint16_t)(RC[n]->P->alpha * 65534),    ALPHA_BITS, F);
+    WriteNBits((uint16_t)(RC[n]->P->beta  * 65534),     BETA_BITS, F);
+    WriteNBits((uint16_t)(RC[n]->P->gamma * 65534),    GAMMA_BITS, F);
+    WriteNBits((uint16_t)(RC[n]->P->iWeight * 65534), WEIGHT_BITS, F);
+    WriteNBits(RC[n]->P->limit,                        LIMIT_BITS, F);
+    WriteNBits(RC[n]->P->ctx,                            CTX_BITS, F);
+    WriteNBits(RC[n]->P->rev,                             IR_BITS, F);
+    } 
 
   #ifdef DEBUG
   printf("size    = %"PRIu64"\n", P->size);
@@ -95,6 +96,7 @@ void EncodeHeader(PARAM *P, RCLASS **RC, CMODEL **CM, FILE *F){
     printf("    alpha   = %g\n",  RC[n]->P->alpha);
     printf("    beta    = %g\n",  RC[n]->P->beta);
     printf("    gamma   = %g\n",  RC[n]->P->gamma);
+    printf("    weight  = %g\n",  RC[n]->P->iWeight);
     printf("    limit   = %u\n",  RC[n]->P->limit);
     printf("    ctx     = %u\n",  RC[n]->P->ctx);
     printf("    ir      = %u\n",  RC[n]->P->rev);
@@ -109,8 +111,7 @@ void Compress(PARAM *P, char *fn){
   FILE      *IN  = Fopen(fn, "r"), *OUT = Fopen(Cat(fn, ".jc"), "w");
   uint64_t  i = 0, mSize = MAX_BUF, pos = 0, r = 0;
   uint32_t  m, n, q, j, c;
-  uint8_t   t[NSYM], *buf   = (uint8_t *) Calloc(mSize,    sizeof(uint8_t)), 
-            sym = 0, *cache = (uint8_t *) Calloc(SCACHE+2, sizeof(uint8_t)),
+  uint8_t   t[NSYM], *buf = (uint8_t *) Calloc(mSize, sizeof(uint8_t)), sym = 0, 
             *p, irSym;
 
   RCLASS    **RC;
@@ -186,7 +187,7 @@ void Compress(PARAM *P, char *fn){
   for(n = 0 ; n < P->nRModels ; ++n){
     RC[n] = CreateRC(P->rmodel[n].nr,    P->rmodel[n].alpha, P->rmodel[n].beta,  
                      P->rmodel[n].limit, P->rmodel[n].ctx,   P->rmodel[n].gamma,
-                     P->rmodel[n].ir);
+                     P->rmodel[n].ir,    P->rmodel[n].weight);
     }
 
   P->length = NBytesInFile(IN);
@@ -215,14 +216,16 @@ void Compress(PARAM *P, char *fn){
       for(r = 0 ; r < P->nCModels ; ++r){       // FOR ALL CMODELS
         CMODEL *FCM = CM[r];
         GetPModelIdx(p, FCM);
-        ComputePModel(FCM, PM[c], FCM->pModelIdx, FCM->alphaDen, freqs[c], &sums[c]);
+        ComputePModel(FCM, PM[c], FCM->pModelIdx, FCM->alphaDen, 
+	freqs[c], &sums[c]);
         ComputeWeightedFreqs(WM->weight[c], PM[c], PT, NSYM);
         if(FCM->edits != 0){
 	  ++c;
           FCM->TM->seq->buf[FCM->TM->seq->idx] = sym;
           FCM->TM->idx = GetPModelIdxCorr(FCM->TM->seq->buf+
           FCM->TM->seq->idx-1, FCM, FCM->TM->idx);
-          ComputePModel(FCM, PM[c], FCM->TM->idx, FCM->TM->den, freqs[c], &sums[c]);
+          ComputePModel(FCM, PM[c], FCM->TM->idx, FCM->TM->den, 
+	  freqs[c], &sums[c]);
           ComputeWeightedFreqs(WM->weight[c], PM[c], PT, FCM->nSym);
           }
         ++c;
@@ -230,14 +233,11 @@ void Compress(PARAM *P, char *fn){
 
       for(r = 0 ; r < P->nRModels ; ++r){             // FOR ALL REPEAT MODELS
         StopRM           (RC[r]);
-        StartMultipleRMs (RC[r], cache+SCACHE-1);
-        //StartMultipleRMs (RC[r], p);
+        StartMultipleRMs (RC[r], p);
         InsertKmerPos    (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
-        //if(RC[r]->P.c_r_idx > RC[r]->r_max)
+	// RemoveKmerPos (RC[r]);
         RenormWeights    (RC[r]);
         ComputeMixture   (RC[r], MX_RM[r], buf);
-//	fprintf(stderr, "%"PRIu64" %lu : %"PRIu64":%"PRIu64"\n", pos, r,  RC[r]->P->idx, CM[0]->pModelIdx);
-//	fprintf(stderr, "%d : %s\n", sym, cache);
 	}
 
       // PASS MX_RM[q] AS LAST MODEL AND SET IT AS PM[c]
@@ -245,15 +245,13 @@ void Compress(PARAM *P, char *fn){
         PM[j]->sum = 0;
         for(r = 0 ; r < NSYM ; ++r){
           PM[j]->freqs[r] = MX_RM[q]->freqs[r];
-	  freqs[c][r] = PM[j]->freqs[r];
+	  freqs[j][r] = PM[j]->freqs[r];
 	  }
-	sums[c] = MX_RM[q]->sum;
+	sums[j] = MX_RM[q]->sum;
         PM[j]->sum = MX_RM[q]->sum;
         ComputeWeightedFreqs(WM->weight[j], PM[j], PT, NSYM);
-	
-       // fprintf(stderr, "RC[%u] -> %.4lf\n", q, WM->weight[j]);
         }
-            
+     
       // FILL PROBABILITIES FOR ALL MODELS FOR NEURAL NETWORK
       for(q = 0 ; q < P->nCPModels ; ++q)
         for(j = 0 ; j < NSYM ; ++j)
@@ -305,7 +303,6 @@ void Compress(PARAM *P, char *fn){
       for(r = 0 ; r < P->nRModels ; ++r)
         UpdateWeights(RC[r], buf, sym);
 
-      ShiftRBuf(cache, SCACHE, sym);  // STORE THE LAST SCACHE BASES & SHIFT 1
       UpdateCBuffer(SB);
       }
 
@@ -353,9 +350,7 @@ void Decompress(char *fn){
   FILE     *IN  = Fopen(fn, "r"), *OUT = Fopen(Cat(fn, ".jd"), "w");
   uint64_t i = 0, mSize = MAX_BUF, pos = 0;
   uint32_t m, n, j, q, r, c;
-  uint8_t  *buf   = (uint8_t *) Calloc(mSize,    sizeof(uint8_t)),
-           *cache = (uint8_t *) Calloc(SCACHE+2, sizeof(uint8_t)), 
-           sym = 0, *p, irSym;
+  uint8_t  *buf = (uint8_t *) Calloc(mSize, sizeof(uint8_t)), sym = 0, *p, irSym;
   RCLASS   **RC = NULL; 
   CMODEL   **CM = NULL;
   PARAM    *P = (PARAM *) Calloc(1, sizeof(PARAM));
@@ -401,10 +396,11 @@ void Decompress(char *fn){
     double    a = ReadNBits(                    ALPHA_BITS, IN) / 65534.0;
     double    b = ReadNBits(                     BETA_BITS, IN) / 65534.0;
     double    g = ReadNBits(                    GAMMA_BITS, IN) / 65534.0;
+    double    w = ReadNBits(                   WEIGHT_BITS, IN) / 65534.0;
     uint32_t  l = ReadNBits(                    LIMIT_BITS, IN);
     uint32_t  c = ReadNBits(                      CTX_BITS, IN);
     uint8_t   r = ReadNBits(                       IR_BITS, IN);
-    RC[n] = CreateRC(m, a, b, l, c, g, r);
+    RC[n] = CreateRC(m, a, b, l, c, g, r, w);
     }
 
   #ifdef DEBUG
@@ -434,6 +430,7 @@ void Decompress(char *fn){
     printf("    alpha   = %g\n",  RC[n]->P->alpha);
     printf("    beta    = %g\n",  RC[n]->P->beta);
     printf("    gamma   = %g\n",  RC[n]->P->gamma);
+    printf("    weight  = %g\n",  RC[n]->P->iWeight);
     printf("    limit   = %u\n",  RC[n]->P->limit);
     printf("    ctx     = %u\n",  RC[n]->P->ctx);
     printf("    ir      = %u\n",  RC[n]->P->rev);
@@ -493,7 +490,7 @@ void Decompress(char *fn){
 
       for(r = 0 ; r < P->nRModels ; ++r){
         StopRM           (RC[r]);
-        StartMultipleRMs (RC[r], cache+SCACHE-1);
+        StartMultipleRMs (RC[r], p);
         InsertKmerPos    (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
         RenormWeights    (RC[r]);
         ComputeMixture   (RC[r], MX_RM[r], buf);
@@ -504,9 +501,9 @@ void Decompress(char *fn){
         PM[j]->sum = 0;
         for(r = 0 ; r < NSYM ; ++r){
           PM[j]->freqs[r] = MX_RM[q]->freqs[r];
-	  freqs[c][r] = PM[j]->freqs[r];
+	  freqs[j][r] = PM[j]->freqs[r];
 	  }
-	sums[c] = MX_RM[q]->sum;
+	sums[j] = MX_RM[q]->sum;
         PM[j]->sum = MX_RM[q]->sum;
         ComputeWeightedFreqs(WM->weight[j], PM[j], PT, NSYM);
         }
@@ -566,7 +563,6 @@ void Decompress(char *fn){
       for(r = 0 ; r < P->nRModels ; ++r)
         UpdateWeights(RC[r], buf, sym);
 
-      ShiftRBuf(cache, SCACHE, sym);  // STORE THE LAST SCACHE BASES & SHIFT 1
       UpdateCBuffer(SB);
       }
 

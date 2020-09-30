@@ -21,12 +21,14 @@
 #define INIWEIGHT        0.999
 
 #define HSIZE        16777259 // NEXT PRIME AFTER 16777216 (24 BITS)
-//#define HSIZE        16777183
 #define MAX_CTX      20       // ((HASH_SIZE (24 B) + KEY (16 B))>>1) = 20 
+
+typedef uint8_t HCP;   
+#define MAX_HASH_COL ((1<<(sizeof(HCP)*8))-1)
 
 typedef struct{
   uint16_t key;      // THE KEY (INDEX / HASHSIZE) STORED IN THIS RENTRY
-  uint8_t  nPos;     // NUMBER OF POSITIONS FOR THIS RENTRY
+  HCP      nPos;     // NUMBER OF POSITIONS FOR THIS RENTRY
   uint32_t *pos;     // THE LAST (NEAREST) REPEATING POSITION
   }
 RENTRY;
@@ -34,6 +36,7 @@ RENTRY;
 typedef struct{
   uint32_t *size;    // NUMBER OF KEYS FOR EACH RENTRY
   RENTRY   **ent;    // ENTRIES VECTORS POINTERS
+  uint64_t max_c;
   }
 RHASH;
 
@@ -55,6 +58,7 @@ typedef struct{
   uint64_t c_max;    // CACHE MAXIMUM THRESHOLD TO REMOVE POSITION
   uint64_t c_idx;    // CACHE CONTEXT INDEX
   uint64_t c_idxRev; // CACHE INVERTED REPEAT INDEX
+  double   iWeight;  // INITIAL WEIGHT FOR EACH REPEAT MODEL CLASS
   }
 RPARAM;
 
@@ -87,12 +91,14 @@ RCLASS;
 void      ShiftRBuf          (uint8_t *, int32_t, uint8_t);
 uint8_t   GetNBase           (uint8_t *, uint64_t);
 RCLASS    *CreateRC          (uint32_t, double, double, uint32_t, uint32_t, 
-                             double, uint8_t);
+                             double, uint8_t, double);
 uint64_t  GetIdxRev          (uint8_t *, RCLASS *);
+uint64_t  GetTIdxRev         (uint8_t *, RCLASS *);
 uint64_t  GetIdx             (uint8_t *, RCLASS *);
+uint64_t  GetTIdx            (uint8_t *, RCLASS *);
 RENTRY    *GetHEnt           (RCLASS *, uint64_t);
 int32_t   StartRM            (RCLASS *, uint32_t, uint64_t, uint8_t);
-void      RemoveKmerPos      (RCLASS *, uint64_t, uint32_t);
+void      RemoveKmerPos      (RCLASS *, uint8_t *);
 void      InsertKmerPos      (RCLASS *, uint64_t, uint32_t);
 void      ComputeRMProbs     (RCLASS *, RMODEL *, uint8_t *);
 void      UpdateRM           (RMODEL *, uint8_t *, uint8_t);

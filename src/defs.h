@@ -20,6 +20,7 @@ typedef struct{
   double   beta;
   int32_t  limit;
   double   gamma;
+  double   weight;
   }
 RModelPar;
 
@@ -43,9 +44,9 @@ typedef struct{
   uint8_t   estim;
   uint8_t   level;
   uint8_t   mode;
-  uint32_t  hs;
-  double    lr;
   uint32_t  col;
+  double    lr;
+  uint32_t  hs;
   uint32_t  nModels;
   uint32_t  nRPModels;
   uint32_t  nCPModels;
@@ -114,6 +115,7 @@ uint32_t garbage;
 #define ALPHA_BITS             16
 #define BETA_BITS              16
 #define GAMMA_BITS             16
+#define WEIGHT_BITS            16
 #define HS_BITS                16
 #define LR_BITS                16
 

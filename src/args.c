@@ -94,11 +94,11 @@ CModelPar ArgsUniqCModel(char *str, uint8_t type){
 
 RModelPar ArgsUniqRModel(char *str, uint8_t type){
   uint32_t   m, ctx, limit, ir;
-  double     alpha, beta, gamma;
+  double     alpha, beta, gamma, weight;
   RModelPar  Mp;
 
-  if(sscanf(str, "%u:%u:%lf:%lf:%u:%lf:%u", 
-  &m, &ctx, &alpha, &beta, &limit, &gamma, &ir) == 7){
+  if(sscanf(str, "%u:%u:%lf:%lf:%u:%lf:%u:%lf", 
+  &m, &ctx, &alpha, &beta, &limit, &gamma, &ir, &weight) == 8){
 
     if(m      >  100000  || m      <  1       ||
        ctx    >  MAX_CTX || ctx    <  MIN_CTX ||
@@ -106,16 +106,18 @@ RModelPar ArgsUniqRModel(char *str, uint8_t type){
        beta   >= 1       || beta   <= 0       ||
        limit  >  21      || limit  <= 0       ||
        gamma  >= 1       || gamma  <= 0       ||
-       ir     >  2){
+       ir     >  2       || weight <= 0       ||
+       weight >= 1){
        FailModelScheme();
        exit(1);
        }
        
     Mp.nr     = m;
     Mp.ctx    = ctx;
-    Mp.alpha  = ((int)(alpha * 65534)) / 65534.0;
-    Mp.beta   = ((int)(beta  * 65534)) / 65534.0;
-    Mp.gamma  = ((int)(gamma * 65534)) / 65534.0;
+    Mp.alpha  = ((int)(alpha  * 65534)) / 65534.0;
+    Mp.beta   = ((int)(beta   * 65534)) / 65534.0;
+    Mp.gamma  = ((int)(gamma  * 65534)) / 65534.0;
+    Mp.weight = ((int)(weight * 65534)) / 65534.0;
     Mp.limit  = limit;
     Mp.ir     = ir;
 
@@ -192,6 +194,8 @@ void PrintArgs(PARAM *P){
     P->rmodel[n].limit);
     fprintf(stderr, "  [+] Using inversions ............. ");
     InvName(P->rmodel[n].ir);
+    fprintf(stderr, "  [+] Init weight .................. %.3lf\n",
+    P->rmodel[n].weight);
     }
 
   fprintf(stderr, "Target file ........................ %s\n", P->tar); 
