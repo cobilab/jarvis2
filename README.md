@@ -33,23 +33,7 @@ or
 
 This will print the following options:
 ```
-                                                                   
-           ██ ███████ ███████ ██    ██ ██ ███████ ███████          
-           ██ ██   ██ ██   ██ ██    ██ ██ ██           ██          
-           ██ ███████ ██████  ██    ██ ██ ███████ ███████          
-      ██   ██ ██   ██ ██  ███  ██  ██  ██      ██ ██               
-      ███████ ██   ██ ██   ███  ████   ██ ███████ ███████          
-                                                                   
-NAME                                                               
-      JARVIS2 v1.1,                                              
-      Efficient lossless compression of genomic sequences          
-                                                                   
-AUTHORS                                                            
-      D. Pratas         pratas@ua.pt                               
-      M. Silva          teixeirasilva@ua.pt                        
-      J. M. Silva       jorge.miguel.ferreira.silva@ua.pt          
-      A. J. Pinho       ap@ua.pt                                   
-                                                                   
+
 SYNOPSIS                                                           
       ./JARVIS2 [OPTION]... [FILE]                                 
                                                                    
