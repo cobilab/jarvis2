@@ -235,7 +235,7 @@ void Compress(PARAM *P, char *fn){
         StopRM           (RC[r]);
         StartMultipleRMs (RC[r], p);
         InsertKmerPos    (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
-	// RemoveKmerPos (RC[r]);
+	RemoveKmerPos    (RC[r], buf);
         RenormWeights    (RC[r]);
         ComputeMixture   (RC[r], MX_RM[r], buf);
 	}
@@ -317,8 +317,9 @@ void Compress(PARAM *P, char *fn){
     WriteNBits(S2N(t[n]), 8, OUT);        // ENCODE REMAINING SYMBOLS
 
   fprintf(stderr, "Done!                                               \n");
-  fprintf(stderr, "Compression: %"PRIu64" -> %"PRIu64" ( %.6g )\n", P->length, 
-  (uint64_t) _bytes_output, (double) _bytes_output * 8.0 / P->length);
+  fprintf(stderr, "Compression: %"PRIu64" -> %"PRIu64" ( %.6g bpb )\n", 
+  P->length, (uint64_t) _bytes_output, (double) _bytes_output*8.0 / P->length);
+  fprintf(stderr, "Ratio: %6lf\n",  (double) P->length / _bytes_output);
 
   finish_encode(OUT);
   doneoutputtingbits(OUT);

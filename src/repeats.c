@@ -149,37 +149,41 @@ int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r){
 // REMOVE KMER POSITION OF RHASH TABLE
 //
 void RemoveKmerPos(RCLASS *C, uint8_t *block){
+	
+  if(C->P->c_idx++ > 100000 /*c_max*/){
+  
+    uint64_t key = GetTIdx(block, C);
+    // GetNBase(b, R->pos)
+    
+    uint32_t n, x, h = (FHASH(key) % HSIZE);
+    uint16_t b = key & 0xffff;
 
-  uint64_t key = GetTIdx(block, C);
+    for(n = 0 ; n < C->hash->size[h] ; ++n)
+      if(C->hash->ent[h][n].key == b){
 
-  uint32_t n, x, h = (FHASH(key) % HSIZE);
-  uint16_t b = key & 0xffff;
+        if(C->hash->ent[h][n].nPos == 0){
+          fprintf(stderr, "Error: removing kmer exception found!\n");
+	  fprintf(stderr, "Error: kmer was never been inserted in RHASH!\n");
+          exit(1);
+          }
 
-  for(n = 0 ; n < C->hash->size[h] ; ++n)
-    if(C->hash->ent[h][n].key == b){
-
-      if(C->hash->ent[h][n].nPos == 0){
-	fprintf(stderr, "Error: removing kmer exception found!\n");
-	fprintf(stderr, "Error: kmer was never been inserted in RHASH!\n");
-        exit(1);
-        }
-
-      if(C->hash->ent[h][n].nPos <= 1){
-	C->hash->ent[h][n].nPos = 0;
-        Free(C->hash->ent[h][n].pos);
-	return;
-	}
-      else{
-	for(x = C->hash->ent[h][n].nPos - 1 ; x > 0 ; x--)
-          C->hash->ent[h][n].pos[x-1] = C->hash->ent[h][n].pos[x];    
-        }
+        if(C->hash->ent[h][n].nPos <= 1){
+	  C->hash->ent[h][n].nPos = 0;
+          Free(C->hash->ent[h][n].pos);
+	  return;
+	  }
+        else{
+	  for(x = C->hash->ent[h][n].nPos - 1 ; x > 0 ; x--)
+            C->hash->ent[h][n].pos[x-1] = C->hash->ent[h][n].pos[x];    
+          }
 	      
-      C->hash->ent[h][n].nPos--;
-      C->hash->ent[h][n].pos = (uint32_t *) Realloc(C->hash->ent[h][n].pos,
-      (C->hash->ent[h][n].nPos) * sizeof(uint32_t));
+        C->hash->ent[h][n].nPos--;
+        C->hash->ent[h][n].pos = (uint32_t *) Realloc(C->hash->ent[h][n].pos,
+        (C->hash->ent[h][n].nPos) * sizeof(uint32_t));
 
-      return;
-      }
+        return;
+        }
+    }
 
   return;
   }
