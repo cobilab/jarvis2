@@ -96,10 +96,17 @@ To see the possible levels (automatic choosen compression parameters), type:
 
 #### Compression of FASTA data ####
 
+It is required to have the following tools installed:
+<pre>
+sudo apt-get install -y bzip2
+sudo apt-get install -y lzma
+</pre>
+
 Preparing FASTA compression setup:
 <pre>
 cd FASTA/
 chmod +x *.sh
+make
 </pre>
 
 Compression:
@@ -112,12 +119,19 @@ Decompression:
 ./JARVIS2_FASTA_DECOMPRESS.sh file.fa.tar
 </pre>
 
-#### Compressioon of FASTQ data ####
+#### Compression of FASTQ data ####
+
+It is required to have the following tools installed:
+<pre>
+sudo apt-get install -y bzip2
+sudo apt-get install -y lzma
+</pre>
 
 Preparing FASTQ compression setup:
 <pre>
 cd FASTQ/
 chmod +x *.sh
+make
 </pre>
 
 Compression:
