@@ -2,7 +2,7 @@
 alt="JARVIS2" width="300" border="0" /></p>
 <p align="center"><b>High reference-free compression of genomic data</b></p>
 
-## INSTALLATION ##
+### INSTALLATION ###
 
 <pre>
 git clone https://github.com/cobilab/jarvis2.git
@@ -10,9 +10,9 @@ cd jarvis2/src/
 make
 </pre>
 
-## EXECUTION
+### EXECUTION ###
 
-### Run JARVIS
+#### Run JARVIS ####
 
 Run JARVIS2 using level 4:
 
@@ -20,7 +20,7 @@ Run JARVIS2 using level 4:
 ./JARVIS2 -v -l 4 File.seq
 </pre>
 
-## PARAMETERS
+### PARAMETERS ###
 
 To see the possible options type
 <pre>
@@ -98,25 +98,25 @@ To see the possible levels (automatic choosen compression parameters) type:
 ./JARVIS2 -s
 </pre>
 
-### FASTA ###
+#### Compression of FASTA data ####
 
 TBD
 
-### FASTQ ###
+#### Compressioon of FASTQ data ####
 
 TBD
 
-## CITATION ##
+### CITATION ###
 
-On using this software/method please cite:
-
+<pre>
 In progress...
+</pre>
 
-## ISSUES ##
+#### ISSUES ###
 
 For any issue let us know at [issues link](https://github.com/cobilab/jarvis2/issues).
 
-## LICENSE ##
+### LICENSE ###
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](LICENSE)
 
