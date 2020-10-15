@@ -103,7 +103,7 @@ chmod +x *.sh
 </pre>
 
 Compression:
-</pre>
+<pre>
 ./JARVIS2_FASTA_COMPRESS.sh file.fa
 </pre>
 
@@ -121,7 +121,7 @@ chmod +x *.sh
 </pre>
 
 Compression:
-</pre>
+<pre>
 ./JARVIS2_FASTQ_COMPRESS.sh file.fastq
 </pre>
 
