@@ -47,8 +47,8 @@ int main(int argc, char *argv[]){
       switch(c){
         case EOF:  goto x; break;
 	case '\n': goto y; break;
-	case 'N':  fprintf(N, "1"); break;
-        default:   fprintf(N, "0"); fprintf(DNA, "%c", c); break;	     
+	case 'N':  fprintf(N, "b"); break;
+        default:   fprintf(N, "a"); fprintf(DNA, "%c", c); break;	     
         }
       }
       

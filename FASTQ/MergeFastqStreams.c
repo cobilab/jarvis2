@@ -65,7 +65,7 @@ int main(int argc, char *argv[]){
       }
 
     for(n = 0 ; n < idx2 ; ++n){
-      if(n_str[n] == '0'){
+      if(n_str[n] == 'a'){
 	c = fgetc(DNA);
         if(c == EOF) break;
 	else fprintf(stdout, "%c", c);

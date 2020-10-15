@@ -96,10 +96,9 @@ To see the possible levels (automatic choosen compression parameters), type:
 
 #### Compression of FASTA data ####
 
-It is required to have the following tools installed:
+It is required to have the following tool installed:
 <pre>
 sudo apt-get install -y bzip2
-sudo apt-get install -y lzma
 </pre>
 
 Preparing FASTA compression setup:
@@ -107,6 +106,7 @@ Preparing FASTA compression setup:
 cd FASTA/
 chmod +x *.sh
 make
+g++ bbb.cpp -o bbb
 </pre>
 
 Compression:
@@ -121,10 +121,9 @@ Decompression:
 
 #### Compression of FASTQ data ####
 
-It is required to have the following tools installed:
+It is required to have the following tool installed:
 <pre>
 sudo apt-get install -y bzip2
-sudo apt-get install -y lzma
 </pre>
 
 Preparing FASTQ compression setup:
@@ -132,6 +131,7 @@ Preparing FASTQ compression setup:
 cd FASTQ/
 chmod +x *.sh
 make
+g++ bbb.cpp -o bbb
 </pre>
 
 Compression:
