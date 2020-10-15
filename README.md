@@ -2,7 +2,7 @@
 alt="JARVIS2" width="300" border="0" /></p>
 <p align="center"><b>High reference-free compression of genomic data</b></p>
 
-### INSTALLATION ###
+### Installation ###
 
 <pre>
 git clone https://github.com/cobilab/jarvis2.git
@@ -10,9 +10,9 @@ cd jarvis2/src/
 make
 </pre>
 
-### EXECUTION ###
+### Execution ###
 
-#### Run JARVIS ####
+#### Run JARVIS2 ####
 
 Run JARVIS2 using level 4:
 
@@ -20,13 +20,9 @@ Run JARVIS2 using level 4:
 ./JARVIS2 -v -l 4 File.seq
 </pre>
 
-### PARAMETERS ###
+### Parameters ###
 
 To see the possible options type
-<pre>
-./JARVIS2
-</pre>
-or
 <pre>
 ./JARVIS2 -h
 </pre>
@@ -93,30 +89,58 @@ DESCRIPTION
 ```
 
 
-To see the possible levels (automatic choosen compression parameters) type:
+To see the possible levels (automatic choosen compression parameters), type:
 <pre>
 ./JARVIS2 -s
 </pre>
 
 #### Compression of FASTA data ####
 
-TBD
+Preparing FASTA compression setup:
+<pre>
+cd FASTA/
+chmod +x *.sh
+</pre>
+
+Compression:
+</pre>
+./JARVIS2_FASTA_COMPRESS.sh file.fa
+</pre>
+
+Decompression:
+<pre>
+./JARVIS2_FASTA_DECOMPRESS.sh file.fa.tar
+</pre>
 
 #### Compressioon of FASTQ data ####
 
-TBD
+Preparing FASTQ compression setup:
+<pre>
+cd FASTQ/
+chmod +x *.sh
+</pre>
 
-### CITATION ###
+Compression:
+</pre>
+./JARVIS2_FASTQ_COMPRESS.sh file.fastq
+</pre>
+
+Decompression:
+<pre>
+./JARVIS2_FASTQ_DECOMPRESS.sh file.fastq.tar
+</pre>
+
+### Citation ###
 
 <pre>
 In progress...
 </pre>
 
-#### ISSUES ###
+#### Issues ###
 
 For any issue let us know at [issues link](https://github.com/cobilab/jarvis2/issues).
 
-### LICENSE ###
+### License ###
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](LICENSE)
 
