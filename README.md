@@ -107,6 +107,7 @@ cd FASTA/
 chmod +x *.sh
 make
 g++ bbb.cpp -o bbb
+cp ../src/JARVIS2 .
 </pre>
 
 Compression:
@@ -132,6 +133,7 @@ cd FASTQ/
 chmod +x *.sh
 make
 g++ bbb.cpp -o bbb
+cp ../src/JARVIS2 .
 </pre>
 
 Compression:
