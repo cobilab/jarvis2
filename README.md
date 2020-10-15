@@ -90,20 +90,21 @@ DESCRIPTION
            Input sequence filename (to compress) -- MANDATORY.     
            File to compress is the last argument.                  
                                                                    
-COPYRIGHT                                                          
-      Copyright (C) 2014-2021, IEETA, University of Aveiro.        
-      This is a Free software, under GPLv3. You may redistribute   
-      copies of it under the terms of the GNU - General Public     
-      License v3 <http://www.gnu.org/licenses/gpl.html>. There     
-      is NOT ANY WARRANTY, to the extent permitted by law. 
-
 ```
 
 
-If you are not interested in setting the template for each model, then use the levels mode. To see the possible levels type:
+To see the possible levels (automatic choosen compression parameters) type:
 <pre>
 ./JARVIS2 -s
 </pre>
+
+### FASTA ###
+
+TBD
+
+### FASTQ ###
+
+TBD
 
 ## CITATION ##
 
