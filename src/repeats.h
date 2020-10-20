@@ -6,7 +6,7 @@
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#define MAX_BUF          1000000
+#define MAX_BUF          2000000
 #define SCACHE           32
 #define NSYM             4
 #define MAXC             65535 //((1<<(sizeof(uint16_t)*8))-1)
@@ -55,7 +55,7 @@ typedef struct{
   double   gamma;    // PERFORMANCE DECAYING PARAMETER
   uint8_t  rev;      // INVERTED REPEAT USAGE [HEAVY -> MEMORY/TIME]
   uint64_t c_pos;    // CACHE INDEX POSITION TO REMOVE STORED POSITION
-  uint64_t c_max;    // CACHE MAXIMUM THRESHOLD TO REMOVE POSITION
+  int64_t  c_max;    // CACHE MAXIMUM THRESHOLD TO REMOVE POSITION
   uint64_t c_idx;    // CACHE CONTEXT INDEX
   uint64_t c_idxRev; // CACHE INVERTED REPEAT INDEX
   double   iWeight;  // INITIAL WEIGHT FOR EACH REPEAT MODEL CLASS
@@ -91,11 +91,11 @@ RCLASS;
 void      ShiftRBuf          (uint8_t *, int32_t, uint8_t);
 uint8_t   GetNBase           (uint8_t *, uint64_t);
 RCLASS    *CreateRC          (uint32_t, double, double, uint32_t, uint32_t, 
-                             double, uint8_t, double);
+                             double, uint8_t, double, uint64_t);
 uint64_t  GetIdxRev          (uint8_t *, RCLASS *);
 uint64_t  GetTIdxRev         (uint8_t *, RCLASS *);
 uint64_t  GetIdx             (uint8_t *, RCLASS *);
-uint64_t  GetTIdx            (uint8_t *, RCLASS *);
+uint64_t  GetTIdx            (RCLASS *, uint8_t, uint8_t);
 RENTRY    *GetHEnt           (RCLASS *, uint64_t);
 int32_t   StartRM            (RCLASS *, uint32_t, uint64_t, uint8_t);
 void      RemoveKmerPos      (RCLASS *, uint8_t *);

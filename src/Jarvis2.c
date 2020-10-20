@@ -67,6 +67,7 @@ void EncodeHeader(PARAM *P, RCLASS **RC, CMODEL **CM, FILE *F){
     WriteNBits(RC[n]->P->limit,                        LIMIT_BITS, F);
     WriteNBits(RC[n]->P->ctx,                            CTX_BITS, F);
     WriteNBits(RC[n]->P->rev,                             IR_BITS, F);
+    WriteNBits(RC[n]->P->c_max,                        CACHE_BITS, F);
     } 
 
   #ifdef DEBUG
@@ -100,6 +101,7 @@ void EncodeHeader(PARAM *P, RCLASS **RC, CMODEL **CM, FILE *F){
     printf("    limit   = %u\n",  RC[n]->P->limit);
     printf("    ctx     = %u\n",  RC[n]->P->ctx);
     printf("    ir      = %u\n",  RC[n]->P->rev);
+    printf("    cache   = %lu\n", RC[n]->P->c_max);
     }
   #endif
   }
@@ -185,9 +187,9 @@ void Compress(PARAM *P, char *fn){
 
   RC = (RCLASS **) Malloc(P->nRModels * sizeof(RCLASS *));
   for(n = 0 ; n < P->nRModels ; ++n){
-    RC[n] = CreateRC(P->rmodel[n].nr,    P->rmodel[n].alpha, P->rmodel[n].beta,  
-                     P->rmodel[n].limit, P->rmodel[n].ctx,   P->rmodel[n].gamma,
-                     P->rmodel[n].ir,    P->rmodel[n].weight);
+    RC[n] = CreateRC(P->rmodel[n].nr,    P->rmodel[n].alpha,  P->rmodel[n].beta,  
+                     P->rmodel[n].limit, P->rmodel[n].ctx,    P->rmodel[n].gamma,
+                     P->rmodel[n].ir,    P->rmodel[n].weight, P->rmodel[n].cache);
     }
 
   P->length = NBytesInFile(IN);
@@ -235,8 +237,7 @@ void Compress(PARAM *P, char *fn){
         StopRM           (RC[r]);
         StartMultipleRMs (RC[r], p);
         InsertKmerPos    (RC[r], RC[r]->P->idx, pos);        // pos = (i<<2)+n
-	RemoveKmerPos    (RC[r], buf);
-        RenormWeights    (RC[r]);
+	RenormWeights    (RC[r]);
         ComputeMixture   (RC[r], MX_RM[r], buf);
 	}
 
@@ -300,8 +301,11 @@ void Compress(PARAM *P, char *fn){
         if(CM[r]->edits != 0)
           UpdateTolerantModel(CM[r]->TM, PM[++c], sym);
 
-      for(r = 0 ; r < P->nRModels ; ++r)
+      for(r = 0 ; r < P->nRModels ; ++r){
+	if(RC[r]->P->c_max != 0) 
+	  RemoveKmerPos(RC[r], buf);
         UpdateWeights(RC[r], buf, sym);
+        }
 
       UpdateCBuffer(SB);
       }
@@ -401,7 +405,8 @@ void Decompress(char *fn){
     uint32_t  l = ReadNBits(                    LIMIT_BITS, IN);
     uint32_t  c = ReadNBits(                      CTX_BITS, IN);
     uint8_t   r = ReadNBits(                       IR_BITS, IN);
-    RC[n] = CreateRC(m, a, b, l, c, g, r, w);
+    uint64_t  s = ReadNBits(                    CACHE_BITS, IN);
+    RC[n] = CreateRC(m, a, b, l, c, g, r, w, s);
     }
 
   #ifdef DEBUG
@@ -426,15 +431,16 @@ void Decompress(char *fn){
     }
   printf("n class = %u\n",        P->nRModels);
   for(n = 0 ; n < P->nRModels ; ++n){
-    printf("  class %u\n",        n + 1);
-    printf("    max rep = %u\n",  RC[n]->mRM);
-    printf("    alpha   = %g\n",  RC[n]->P->alpha);
-    printf("    beta    = %g\n",  RC[n]->P->beta);
-    printf("    gamma   = %g\n",  RC[n]->P->gamma);
-    printf("    weight  = %g\n",  RC[n]->P->iWeight);
-    printf("    limit   = %u\n",  RC[n]->P->limit);
-    printf("    ctx     = %u\n",  RC[n]->P->ctx);
-    printf("    ir      = %u\n",  RC[n]->P->rev);
+    printf("  class %u\n",              n + 1);
+    printf("    max rep = %u\n",        RC[n]->mRM);
+    printf("    alpha   = %g\n",        RC[n]->P->alpha);
+    printf("    beta    = %g\n",        RC[n]->P->beta);
+    printf("    gamma   = %g\n",        RC[n]->P->gamma);
+    printf("    weight  = %g\n",        RC[n]->P->iWeight);
+    printf("    limit   = %u\n",        RC[n]->P->limit);
+    printf("    ctx     = %u\n",        RC[n]->P->ctx);
+    printf("    ir      = %u\n",        RC[n]->P->rev);
+    printf("    cache   = %"PRIu64"\n", RC[n]->P->c_max);
     }
   #endif
 
@@ -561,8 +567,11 @@ void Decompress(char *fn){
         if(CM[r]->edits != 0)
           UpdateTolerantModel(CM[r]->TM, PM[++c], sym);
 
-      for(r = 0 ; r < P->nRModels ; ++r)
+      for(r = 0 ; r < P->nRModels ; ++r){
         UpdateWeights(RC[r], buf, sym);
+        if(RC[r]->P->c_max != 0) 
+	  RemoveKmerPos(RC[r], buf);
+        }
 
       UpdateCBuffer(SB);
       }

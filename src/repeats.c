@@ -40,7 +40,7 @@ uint8_t GetNBase(uint8_t *b, uint64_t i){
 // CREATES THE RCLASS BASIC STRUCTURE 
 //
 RCLASS *CreateRC(uint32_t m, double a, double b, uint32_t l, uint32_t c,
-double g, uint8_t i, double w){
+double g, uint8_t i, double w, uint64_t s){
   RCLASS *C      = (RCLASS   *) Calloc(1,     sizeof(RCLASS  ));
   C->hash        = (RHASH    *) Calloc(1,     sizeof(RHASH   ));
   C->P           = (RPARAM   *) Calloc(1,     sizeof(RPARAM  ));
@@ -59,7 +59,7 @@ double g, uint8_t i, double w){
   C->P->idx      = 0;
   C->P->idxRev   = 0;
   C->P->c_pos    = 0;
-  C->P->c_max    = 10000000;
+  C->P->c_max    = s;
   C->P->c_idx    = 0;
   C->P->c_idxRev = 0;
   C->P->iWeight  = w;
@@ -91,8 +91,8 @@ uint64_t GetTIdxRev(uint8_t *p, RCLASS *C){
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // THRESHOLD INDEX CALC BASED ON PAST SYMBOLS
 //
-uint64_t GetTIdx(uint8_t *p, RCLASS *C){
-  return (C->P->c_idx = ((C->P->c_idx-*(p-C->P->ctx)*C->P->mult)<<2)+*p);
+uint64_t GetTIdx(RCLASS *C, uint8_t p_current, uint8_t p_current_less_k){
+  return (C->P->c_idx = ((C->P->c_idx-p_current_less_k*C->P->mult)<<2)+p_current);
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -149,37 +149,37 @@ int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r){
 // REMOVE KMER POSITION OF RHASH TABLE
 //
 void RemoveKmerPos(RCLASS *C, uint8_t *block){
-	
-  if(C->P->c_idx++ > 100000 /*c_max*/){
-  
-    uint64_t key = GetTIdx(block, C);
-    // GetNBase(b, R->pos)
-    
+
+  int32_t previous = 0;
+  if(C->P->c_pos > C->P->ctx)
+    previous = C->P->c_pos-C->P->ctx;
+  uint64_t key = GetTIdx(C, GetNBase(block, C->P->c_pos), GetNBase(block, previous));
+
+  if(C->P->c_pos++ > C->P->c_max){
+ 
     uint32_t n, x, h = (FHASH(key) % HSIZE);
     uint16_t b = key & 0xffff;
 
     for(n = 0 ; n < C->hash->size[h] ; ++n)
       if(C->hash->ent[h][n].key == b){
 
-        if(C->hash->ent[h][n].nPos == 0){
+        if(C->hash->ent[h][n].nPos < 1){
           fprintf(stderr, "Error: removing kmer exception found!\n");
-	  fprintf(stderr, "Error: kmer was never been inserted in RHASH!\n");
+	  fprintf(stderr, "Error: kmer was never inserted in RHASH!\n");
           exit(1);
           }
-
-        if(C->hash->ent[h][n].nPos <= 1){
-	  C->hash->ent[h][n].nPos = 0;
-          Free(C->hash->ent[h][n].pos);
-	  return;
-	  }
-        else{
+        else if(C->hash->ent[h][n].nPos == 1){
+	
+	  ;	
+	  }	
+	else if(C->hash->ent[h][n].nPos > 1){
 	  for(x = C->hash->ent[h][n].nPos - 1 ; x > 0 ; x--)
             C->hash->ent[h][n].pos[x-1] = C->hash->ent[h][n].pos[x];    
-          }
 	      
-        C->hash->ent[h][n].nPos--;
-        C->hash->ent[h][n].pos = (uint32_t *) Realloc(C->hash->ent[h][n].pos,
-        (C->hash->ent[h][n].nPos) * sizeof(uint32_t));
+          C->hash->ent[h][n].nPos--;
+          C->hash->ent[h][n].pos = (uint32_t *) Realloc(C->hash->ent[h][n].pos,
+          (C->hash->ent[h][n].nPos) * sizeof(uint32_t));
+	  }
 
         return;
         }
@@ -199,8 +199,13 @@ void InsertKmerPos(RCLASS *C, uint64_t key, uint32_t pos){
   for(n = 0 ; n < C->hash->size[h] ; ++n)
     if(C->hash->ent[h][n].key == b){
 
-      if(C->hash->ent[h][n].nPos == C->hash->max_c){  // PROTECTION FOR MAX BITS
-        C->hash->ent[h][n].nPos = 0;
+      if(C->hash->ent[h][n].nPos >= C->hash->max_c){  // PROTECTION FOR MAX BITS
+	C->hash->ent[h][n].nPos = 128; // RESET TO 128 ON MAX
+        C->hash->ent[h][n].pos = (uint32_t *) Realloc(C->hash->ent[h][n].pos,
+                                 (C->hash->ent[h][n].nPos) * sizeof(uint32_t));
+        C->hash->ent[h][n].pos[0] = pos;
+        C->hash->ent[h][n].key    = (uint16_t) (key & 0xffff);
+        // fprintf(stderr, "Warning: reached MAX! of C->hash->max_c!\n");
 	return;
         }
 

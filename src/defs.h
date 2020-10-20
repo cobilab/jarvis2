@@ -21,6 +21,7 @@ typedef struct{
   int32_t  limit;
   double   gamma;
   double   weight;
+  uint64_t cache;
   }
 RModelPar;
 
@@ -86,6 +87,7 @@ uint32_t garbage;
 #define MIN_LEVEL              1
 #define MAX_CTX                20
 #define MIN_CTX                1
+#define MIN_CACHE              50
 #define MAX_DEN                1000000
 #define MIN_DEN                1
 #define BGUARD                 32
@@ -117,6 +119,7 @@ uint32_t garbage;
 #define BETA_BITS              16
 #define GAMMA_BITS             16
 #define WEIGHT_BITS            16
+#define CACHE_BITS             34
 #define HS_BITS                16
 #define LR_BITS                16
 

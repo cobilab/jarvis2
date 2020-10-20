@@ -61,7 +61,7 @@ void ModelsExplanation(void){
   "      ... (you may use several context models)                     \n"
   "                                                                   \n"
   "                                                                   \n"
-  "      -rm [NB_R]:[NB_C]:[NB_A]:[NB_B]:[NB_L]:[NB_G]:[NB_I]:[NB_W]  \n"
+  "      -rm [NB_R]:[NB_C]:[NB_A]:[NB_B]:[NB_L]:[NB_G]:[NB_I]:[NB_W]:[NB_Y]\n"
   "      Template of a repeat model.                                  \n"
   "      Parameters:                                                  \n"
   "      [NB_R]: (integer [1;10000] maximum number of repeat models   \n"
@@ -92,6 +92,9 @@ void ModelsExplanation(void){
   "              use of this sub-program increases the necessary time \n"
   "              to compress but it does not affect the RAM.          \n"
   "      [NB_W]: (real (0;1)) initial weight for the repeat class.    \n"
+  "      [NB_Y]: (integer {0}, [50;*]) repeat cache size. This will   \n"
+  "              use a cache of entries while hashing. Value '0' will \n"
+  "              use the whole sequence length.                       \n"
   "                                                                   \n");
   } 
 

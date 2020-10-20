@@ -94,11 +94,12 @@ CModelPar ArgsUniqCModel(char *str, uint8_t type){
 
 RModelPar ArgsUniqRModel(char *str, uint8_t type){
   uint32_t   m, ctx, limit, ir;
+  uint64_t   cache;
   double     alpha, beta, gamma, weight;
   RModelPar  Mp;
 
-  if(sscanf(str, "%u:%u:%lf:%lf:%u:%lf:%u:%lf", 
-  &m, &ctx, &alpha, &beta, &limit, &gamma, &ir, &weight) == 8){
+  if(sscanf(str, "%u:%u:%lf:%lf:%u:%lf:%u:%lf:%lu", 
+  &m, &ctx, &alpha, &beta, &limit, &gamma, &ir, &weight, &cache) == 9){
 
     if(m      >  100000  || m      <  1       ||
        ctx    >  MAX_CTX || ctx    <  MIN_CTX ||
@@ -107,7 +108,7 @@ RModelPar ArgsUniqRModel(char *str, uint8_t type){
        limit  >  21      || limit  <= 0       ||
        gamma  >= 1       || gamma  <= 0       ||
        ir     >  2       || weight <= 0       ||
-       weight >= 1){
+       weight >= 1       || (cache  < MIN_CACHE && cache != 0)){
        FailModelScheme();
        exit(1);
        }
@@ -120,6 +121,7 @@ RModelPar ArgsUniqRModel(char *str, uint8_t type){
     Mp.weight = ((int)(weight * 65534)) / 65534.0;
     Mp.limit  = limit;
     Mp.ir     = ir;
+    Mp.cache  = cache;
 
     return Mp;
     }
@@ -196,6 +198,11 @@ void PrintArgs(PARAM *P){
     InvName(P->rmodel[n].ir);
     fprintf(stderr, "  [+] Init weight .................. %.3lf\n",
     P->rmodel[n].weight);
+    if(P->rmodel[n].cache != 0)
+      fprintf(stderr, "  [+] Cache ........................ %"PRIu64"\n",
+      P->rmodel[n].cache);
+    else
+      fprintf(stderr, "  [+] Cache ........................ (seq size)\n");
     }
 
   fprintf(stderr, "Target file ........................ %s\n", P->tar); 
