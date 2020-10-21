@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include "repeats.h"
 #include "common.h"
 #include "dna.h"
@@ -84,8 +85,8 @@ uint64_t GetIdx(uint8_t *p, RCLASS *C){
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // THRESHOLD REVERSE COMPLEMENT INDEX BASED ON PAST SYMBOLS
 //
-uint64_t GetTIdxRev(uint8_t *p, RCLASS *C){
-  return (C->P->c_idxRev = (C->P->c_idxRev>>2)+CompNum(*p)*C->P->mult);
+uint64_t GetTIdxRev(RCLASS *C, uint8_t p_current){
+  return (C->P->c_idxRev = (C->P->c_idxRev>>2)+CompNum(p_current)*C->P->mult);
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -148,7 +149,7 @@ int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r){
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // REMOVE KMER POSITION OF RHASH TABLE
 //
-void RemoveKmerPos(RCLASS *C, uint8_t *block){
+void RemoveKmerPosRegular(RCLASS *C, uint8_t *block){
 
   int32_t previous = 0;
   if(C->P->c_pos > C->P->ctx)
@@ -169,8 +170,7 @@ void RemoveKmerPos(RCLASS *C, uint8_t *block){
           exit(1);
           }
         else if(C->hash->ent[h][n].nPos == 1){
-	
-	  ;	
+	  return;
 	  }	
 	else if(C->hash->ent[h][n].nPos > 1){
 	  for(x = C->hash->ent[h][n].nPos - 1 ; x > 0 ; x--)
@@ -187,6 +187,58 @@ void RemoveKmerPos(RCLASS *C, uint8_t *block){
 
   return;
   }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// REMOVE IR KMER POSITION OF RHASH TABLE
+//
+void RemoveKmerPosIR(RCLASS *C, uint8_t *block){
+
+  uint64_t key = GetTIdxRev(C, GetNBase(block, C->P->c_pos));
+
+  if(C->P->c_pos++ > C->P->c_max){
+
+    uint32_t n, x, h = (FHASH(key) % HSIZE);
+    uint16_t b = key & 0xffff;
+
+    for(n = 0 ; n < C->hash->size[h] ; ++n)
+      if(C->hash->ent[h][n].key == b){
+
+        if(C->hash->ent[h][n].nPos < 1){
+          fprintf(stderr, "Error: removing IR kmer exception found!\n");
+          fprintf(stderr, "Error: IR kmer was never inserted in RHASH!\n");
+          exit(1);
+          }
+        else if(C->hash->ent[h][n].nPos == 1){
+          return;
+          }
+        else if(C->hash->ent[h][n].nPos > 1){
+          for(x = C->hash->ent[h][n].nPos - 1 ; x > 0 ; x--)
+            C->hash->ent[h][n].pos[x-1] = C->hash->ent[h][n].pos[x];
+
+          C->hash->ent[h][n].nPos--;
+          C->hash->ent[h][n].pos = (uint32_t *) Realloc(C->hash->ent[h][n].pos,
+          (C->hash->ent[h][n].nPos) * sizeof(uint32_t));
+          }
+
+        return;
+        }
+    }
+
+  return;
+  }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// REMOVE REGULAR AND IR KMER POSITION OF RHASH TABLE
+//
+void RemoveKmerPos(RCLASS *C, uint8_t *block){
+  
+  if(C->P->rev != 2)
+    RemoveKmerPosRegular(C, block);
+  if(C->P->rev != 0)
+    RemoveKmerPosIR(C, block);
+  
+  return;
+  }	
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // INSERT KMER POSITION INTO RHASH TABLE 

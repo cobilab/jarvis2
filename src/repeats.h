@@ -93,8 +93,8 @@ uint8_t   GetNBase           (uint8_t *, uint64_t);
 RCLASS    *CreateRC          (uint32_t, double, double, uint32_t, uint32_t, 
                              double, uint8_t, double, uint64_t);
 uint64_t  GetIdxRev          (uint8_t *, RCLASS *);
-uint64_t  GetTIdxRev         (uint8_t *, RCLASS *);
 uint64_t  GetIdx             (uint8_t *, RCLASS *);
+uint64_t  GetTIdxRev         (RCLASS *, uint8_t);
 uint64_t  GetTIdx            (RCLASS *, uint8_t, uint8_t);
 RENTRY    *GetHEnt           (RCLASS *, uint64_t);
 int32_t   StartRM            (RCLASS *, uint32_t, uint64_t, uint8_t);
