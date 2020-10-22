@@ -8,7 +8,7 @@ INPUT="$1";
 [ ! -f $INPUT ] && { echo "$0: file $INPUT not found."; exit 2; }
 #
 ./SplitFastqStreams < $INPUT
-./JARVIS2 -f DNA.JV2 &
+./JARVIS2 -l 5 -f DNA.JV2 &
 bzip2 -f N.JV2 &
 ./bbb cfm30q HEADERS.JV2 HEADERS.JV2.bbb &
 ./bbb cfm40q QUALITIES.JV2 QUALITIES.JV2.bbb &

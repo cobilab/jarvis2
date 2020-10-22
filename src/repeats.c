@@ -232,10 +232,10 @@ void RemoveKmerPosIR(RCLASS *C, uint8_t *block){
 //
 void RemoveKmerPos(RCLASS *C, uint8_t *block){
   
-  if(C->P->rev != 2)
+//  if(C->P->rev != 2)
     RemoveKmerPosRegular(C, block);
-  if(C->P->rev != 0)
-    RemoveKmerPosIR(C, block);
+//  if(C->P->rev != 0)
+//    RemoveKmerPosIR(C, block);
   
   return;
   }	
@@ -286,8 +286,11 @@ void InsertKmerPos(RCLASS *C, uint64_t key, uint32_t pos){
 // COMPUTE REPEAT MODEL PROBABILITIES
 //
 void ComputeRMProbs(RCLASS *C, RMODEL *R, uint8_t *b){
+  
   uint8_t n, s;
-  s = (R->rev == 1) ? CompNum(GetNBase(b, R->pos)) : GetNBase(b, R->pos);
+  
+  s = (R->rev != 0) ? CompNum(GetNBase(b, R->pos)) : GetNBase(b, R->pos);
+
   R->probs[s] = (R->nHits+C->P->alpha) / (R->nTries+2*C->P->alpha);
   for(n = 0 ; n < NSYM ; ++n)
     if(n != s){
@@ -299,7 +302,9 @@ void ComputeRMProbs(RCLASS *C, RMODEL *R, uint8_t *b){
 // UPDATE REPEAT MODEL
 //
 void UpdateRM(RMODEL *R, uint8_t *b, uint8_t s){
+
   R->lastHit = 1;
+
   if(R->rev == 0){
     if(GetNBase(b, R->pos++) == s){
       R->nHits++;
@@ -312,6 +317,7 @@ void UpdateRM(RMODEL *R, uint8_t *b, uint8_t s){
       R->lastHit = 0;
       }
     }
+
   R->nTries++;
   }
 
@@ -353,11 +359,10 @@ void StopRM(RCLASS *C){
 //                         
 void StartMultipleRMs(RCLASS *C, uint8_t *b){
   
-  if(C->P->rev != 2){
-    uint64_t idx = GetIdx(b, C);
+  uint64_t idx = GetIdx(b, C); // DO NOT SET IT INSIDE THE NEXT IF!
+  if(C->P->rev != 2)
     if(C->nRM < C->mRM && StartRM(C, C->nRM, idx, 0))
       C->nRM++;
-    }
 
   if(C->P->rev != 0){
     uint64_t idx_rev = GetIdxRev(b, C);

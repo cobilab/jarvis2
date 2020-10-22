@@ -102,8 +102,8 @@ uint32_t garbage;
 #define REFERENCE              1
 #define TARGET                 0
 #define DEF_EXPLANATION        0
-#define SIZE_BITS              46
-#define LENGTH_BITS            46
+#define SIZE_BITS              48
+#define LENGTH_BITS            48
 #define SELECTION_BITS         8
 #define NCMODELS_BITS          8
 #define CTX_BITS               8

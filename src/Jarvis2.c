@@ -106,6 +106,38 @@ void EncodeHeader(PARAM *P, RCLASS **RC, CMODEL **CM, FILE *F){
   #endif
   }
 
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// UPDATE CMODELS
+//
+void UpdateCModels(CMODEL **CM, CBUF *SB, uint8_t sym, uint32_t nCModels){
+  
+  uint8_t irSym = 0;
+  uint32_t r;	
+  
+  for(r = 0 ; r < nCModels ; ++r){
+    switch(CM[r]->ir){
+      case 0:
+      UpdateCModelCounter(CM[r], sym, CM[r]->pModelIdx);
+      break;
+      case 1:
+      UpdateCModelCounter(CM[r], sym, CM[r]->pModelIdx);
+      irSym = GetPModelIdxIR(SB->buf+SB->idx, CM[r]);
+      UpdateCModelCounter(CM[r], irSym, CM[r]->pModelIdxIR);
+      break;
+      case 2:
+      irSym = GetPModelIdxIR(SB->buf+SB->idx, CM[r]);
+      UpdateCModelCounter(CM[r], irSym, CM[r]->pModelIdxIR);
+      break;
+      default:
+      UpdateCModelCounter(CM[r], sym, CM[r]->pModelIdx);
+      break;
+      }
+    }
+
+  return;
+  }
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // COMPRESSION
 //
@@ -114,7 +146,7 @@ void Compress(PARAM *P, char *fn){
   uint64_t  i = 0, mSize = MAX_BUF, pos = 0, r = 0;
   uint32_t  m, n, q, j, c;
   uint8_t   t[NSYM], *buf = (uint8_t *) Calloc(mSize, sizeof(uint8_t)), sym = 0, 
-            *p, irSym;
+            *p; 
 
   RCLASS    **RC;
   CMODEL    **CM;
@@ -197,7 +229,7 @@ void Compress(PARAM *P, char *fn){
 
   if(P->verbose){
     fprintf(stderr, "Done!\n");
-    fprintf(stderr, "Compressing %"PRIu64" symbols ...\n", P->size);
+    fprintf(stderr, "Compressing %"PRIu64" symbols ...\n", P->length);
     }
 
   startoutputtingbits();
@@ -276,25 +308,9 @@ void Compress(PARAM *P, char *fn){
       #endif
 
       CalcDecayment(WM, PM, sym);
-      for(r = 0 ; r < P->nCModels ; ++r){
-        switch(CM[r]->ir){
-          case 0:
-          UpdateCModelCounter(CM[r], sym, CM[r]->pModelIdx);
-          break;
-          case 1:
-          UpdateCModelCounter(CM[r], sym, CM[r]->pModelIdx);
-          irSym = GetPModelIdxIR(SB->buf+SB->idx, CM[r]);
-          UpdateCModelCounter(CM[r], irSym, CM[r]->pModelIdxIR);
-          break;
-          case 2:
-          irSym = GetPModelIdxIR(SB->buf+SB->idx, CM[r]);
-          UpdateCModelCounter(CM[r], irSym, CM[r]->pModelIdxIR);
-          break;
-          default:
-          UpdateCModelCounter(CM[r], sym, CM[r]->pModelIdx);
-          break;
-          }
-        }
+
+      UpdateCModels(CM, SB, sym, P->nCModels);
+
       RenormalizeWeights(WM);
 
       for(r = 0, c = 0 ; r < P->nCModels ; ++r, ++c)
@@ -355,7 +371,7 @@ void Decompress(char *fn){
   FILE     *IN  = Fopen(fn, "r"), *OUT = Fopen(Cat(fn, ".jd"), "w");
   uint64_t i = 0, mSize = MAX_BUF, pos = 0;
   uint32_t m, n, j, q, r, c;
-  uint8_t  *buf = (uint8_t *) Calloc(mSize, sizeof(uint8_t)), sym = 0, *p, irSym;
+  uint8_t  *buf = (uint8_t *) Calloc(mSize, sizeof(uint8_t)), sym = 0, *p;
   RCLASS   **RC = NULL; 
   CMODEL   **CM = NULL;
   PARAM    *P = (PARAM *) Calloc(1, sizeof(PARAM));
@@ -542,25 +558,9 @@ void Decompress(char *fn){
           CM[r]->TM->seq->buf[CM[r]->TM->seq->idx] = sym;
 
       CalcDecayment(WM, PM, sym);
-      for(r = 0 ; r < P->nCModels ; ++r){
-        switch(CM[r]->ir){
-          case 0:
-          UpdateCModelCounter(CM[r], sym, CM[r]->pModelIdx);
-          break;
-          case 1:
-          UpdateCModelCounter(CM[r], sym, CM[r]->pModelIdx);
-          irSym = GetPModelIdxIR(SB->buf+SB->idx, CM[r]);
-          UpdateCModelCounter(CM[r], irSym, CM[r]->pModelIdxIR);
-          break;
-          case 2:
-          irSym = GetPModelIdxIR(SB->buf+SB->idx, CM[r]);
-          UpdateCModelCounter(CM[r], irSym, CM[r]->pModelIdxIR);
-          break;
-          default:
-          UpdateCModelCounter(CM[r], sym, CM[r]->pModelIdx);
-          break;
-          }
-        }
+
+      UpdateCModels(CM, SB, sym, P->nCModels);
+      
       RenormalizeWeights(WM);
 
       for(r = 0, c = 0 ; r < P->nCModels ; ++r, ++c)
