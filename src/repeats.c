@@ -121,7 +121,7 @@ int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r){
   if((E = GetHEnt(C, i)) == NULL)
     return 0;
 
-  uint32_t idx;
+  uint64_t idx;
   if(E->nPos > 0)
     idx = rand() % E->nPos;
   else
@@ -149,16 +149,16 @@ int32_t StartRM(RCLASS *C, uint32_t m, uint64_t i, uint8_t r){
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // REMOVE KMER POSITION OF RHASH TABLE
 //
-void RemoveKmerPosRegular(RCLASS *C, uint8_t *block){
+void RemoveKmerPos(RCLASS *C, uint8_t *block){
 
-  int32_t previous = 0;
+  int64_t previous = 0;
   if(C->P->c_pos > C->P->ctx)
     previous = C->P->c_pos-C->P->ctx;
   uint64_t key = GetTIdx(C, GetNBase(block, C->P->c_pos), GetNBase(block, previous));
 
   if(C->P->c_pos++ > C->P->c_max){
  
-    uint32_t n, x, h = (FHASH(key) % HSIZE);
+    uint64_t n, x, h = (FHASH(key) % HSIZE);
     uint16_t b = key & 0xffff;
 
     for(n = 0 ; n < C->hash->size[h] ; ++n)
@@ -177,8 +177,8 @@ void RemoveKmerPosRegular(RCLASS *C, uint8_t *block){
             C->hash->ent[h][n].pos[x-1] = C->hash->ent[h][n].pos[x];    
 	      
           C->hash->ent[h][n].nPos--;
-          C->hash->ent[h][n].pos = (uint32_t *) Realloc(C->hash->ent[h][n].pos,
-          (C->hash->ent[h][n].nPos) * sizeof(uint32_t));
+          C->hash->ent[h][n].pos = (POS_PREC *) Realloc(C->hash->ent[h][n].pos,
+          (C->hash->ent[h][n].nPos) * sizeof(POS_PREC));
 	  }
 
         return;
@@ -189,63 +189,11 @@ void RemoveKmerPosRegular(RCLASS *C, uint8_t *block){
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// REMOVE IR KMER POSITION OF RHASH TABLE
-//
-void RemoveKmerPosIR(RCLASS *C, uint8_t *block){
-
-  uint64_t key = GetTIdxRev(C, GetNBase(block, C->P->c_pos));
-
-  if(C->P->c_pos++ > C->P->c_max){
-
-    uint32_t n, x, h = (FHASH(key) % HSIZE);
-    uint16_t b = key & 0xffff;
-
-    for(n = 0 ; n < C->hash->size[h] ; ++n)
-      if(C->hash->ent[h][n].key == b){
-
-        if(C->hash->ent[h][n].nPos < 1){
-          fprintf(stderr, "Error: removing IR kmer exception found!\n");
-          fprintf(stderr, "Error: IR kmer was never inserted in RHASH!\n");
-          exit(1);
-          }
-        else if(C->hash->ent[h][n].nPos == 1){
-          return;
-          }
-        else if(C->hash->ent[h][n].nPos > 1){
-          for(x = C->hash->ent[h][n].nPos - 1 ; x > 0 ; x--)
-            C->hash->ent[h][n].pos[x-1] = C->hash->ent[h][n].pos[x];
-
-          C->hash->ent[h][n].nPos--;
-          C->hash->ent[h][n].pos = (uint32_t *) Realloc(C->hash->ent[h][n].pos,
-          (C->hash->ent[h][n].nPos) * sizeof(uint32_t));
-          }
-
-        return;
-        }
-    }
-
-  return;
-  }
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// REMOVE REGULAR AND IR KMER POSITION OF RHASH TABLE
-//
-void RemoveKmerPos(RCLASS *C, uint8_t *block){
-  
-//  if(C->P->rev != 2)
-    RemoveKmerPosRegular(C, block);
-//  if(C->P->rev != 0)
-//    RemoveKmerPosIR(C, block);
-  
-  return;
-  }	
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // INSERT KMER POSITION INTO RHASH TABLE 
 //
-void InsertKmerPos(RCLASS *C, uint64_t key, uint32_t pos){
+void InsertKmerPos(RCLASS *C, uint64_t key, POS_PREC pos){
 
-  uint32_t n, h = (FHASH(key) % HSIZE);
+  uint64_t n, h = (FHASH(key) % HSIZE);
   uint16_t b = key & 0xffff;
 
   for(n = 0 ; n < C->hash->size[h] ; ++n)
@@ -253,16 +201,16 @@ void InsertKmerPos(RCLASS *C, uint64_t key, uint32_t pos){
 
       if(C->hash->ent[h][n].nPos >= C->hash->max_c){  // PROTECTION FOR MAX BITS
 	C->hash->ent[h][n].nPos = 128; // RESET TO 128 ON MAX
-        C->hash->ent[h][n].pos = (uint32_t *) Realloc(C->hash->ent[h][n].pos,
-                                 (C->hash->ent[h][n].nPos) * sizeof(uint32_t));
+        C->hash->ent[h][n].pos = (POS_PREC *) Realloc(C->hash->ent[h][n].pos,
+                                 (C->hash->ent[h][n].nPos) * sizeof(POS_PREC));
         C->hash->ent[h][n].pos[0] = pos;
         C->hash->ent[h][n].key    = (uint16_t) (key & 0xffff);
         // fprintf(stderr, "Warning: reached MAX! of C->hash->max_c!\n");
 	return;
         }
 
-      C->hash->ent[h][n].pos = (uint32_t *) Realloc(C->hash->ent[h][n].pos, 
-      (C->hash->ent[h][n].nPos + 1) * sizeof(uint32_t));
+      C->hash->ent[h][n].pos = (POS_PREC *) Realloc(C->hash->ent[h][n].pos, 
+      (C->hash->ent[h][n].nPos + 1) * sizeof(POS_PREC));
       C->hash->ent[h][n].pos[C->hash->ent[h][n].nPos] = pos; 
       C->hash->ent[h][n].nPos++;
       // STORE THE LAST K-MER POSITION
@@ -274,8 +222,8 @@ void InsertKmerPos(RCLASS *C, uint64_t key, uint32_t pos){
                     (C->hash->size[h]+1) * sizeof(RENTRY));
   
   // CREATE A NEW POSITION
-  C->hash->ent[h][C->hash->size[h]].pos    = (uint32_t *) Calloc(1, 
-		                             sizeof(uint32_t));
+  C->hash->ent[h][C->hash->size[h]].pos    = (POS_PREC *) Calloc(1, 
+		                             sizeof(POS_PREC));
   C->hash->ent[h][C->hash->size[h]].nPos   = 1;
   C->hash->ent[h][C->hash->size[h]].pos[0] = pos;
   C->hash->ent[h][C->hash->size[h]].key    = (uint16_t) (key & 0xffff);

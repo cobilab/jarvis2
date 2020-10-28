@@ -23,13 +23,15 @@
 #define HSIZE        16777259 // NEXT PRIME AFTER 16777216 (24 BITS)
 #define MAX_CTX      20       // ((HASH_SIZE (24 B) + KEY (16 B))>>1) = 20 
 
-typedef uint8_t HCP;   
+typedef uint8_t      HCP;   
+typedef uint64_t     POS_PREC;   
+
 #define MAX_HASH_COL ((1<<(sizeof(HCP)*8))-1)
 
 typedef struct{
   uint16_t key;      // THE KEY (INDEX / HASHSIZE) STORED IN THIS RENTRY
   HCP      nPos;     // NUMBER OF POSITIONS FOR THIS RENTRY
-  uint32_t *pos;     // THE LAST (NEAREST) REPEATING POSITION
+  POS_PREC *pos;     // THE LAST (NEAREST) REPEATING POSITION
   }
 RENTRY;
 
@@ -63,7 +65,7 @@ typedef struct{
 RPARAM;
 
 typedef struct{
-  uint32_t pos;      // POSITION OF THE SYMBOL
+  uint64_t pos;      // POSITION OF THE SYMBOL
   uint32_t nHits;    // NUMBER OF TIMES THIS MODEL WAS CORRECT
   uint32_t nTries;   // NUMBER OF TIMES THIS MODEL WAS USED
   double   probs[4]; // REPEAT MODEL SYMBOL PROBABILITIES
@@ -99,7 +101,7 @@ uint64_t  GetTIdx            (RCLASS *, uint8_t, uint8_t);
 RENTRY    *GetHEnt           (RCLASS *, uint64_t);
 int32_t   StartRM            (RCLASS *, uint32_t, uint64_t, uint8_t);
 void      RemoveKmerPos      (RCLASS *, uint8_t *);
-void      InsertKmerPos      (RCLASS *, uint64_t, uint32_t);
+void      InsertKmerPos      (RCLASS *, uint64_t, POS_PREC);
 void      ComputeRMProbs     (RCLASS *, RMODEL *, uint8_t *);
 void      UpdateRM           (RMODEL *, uint8_t *, uint8_t);
 void      RenormWeights      (RCLASS *);
