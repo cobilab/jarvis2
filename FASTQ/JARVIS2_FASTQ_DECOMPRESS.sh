@@ -9,11 +9,11 @@ INPUT="$1";
 #
 tar -xvf $INPUT
 ./bbb dqf HEADERS.JV2.bbb HEADERS.JV2 &
-./JARVIS2 -f -d DNA.JV2.jc &
+./MergeDNA.sh "DNA.JV2.tar" "10MB" "8" &
 bunzip2 -f N.JV2.bz2 &
 ./bbb dqf QUALITIES.JV2.bbb QUALITIES.JV2 &
 wait
-mv DNA.JV2.jc.jd DNA.JV2
+mv DNA.JV2.tar.out DNA.JV2
 ./MergeFastqStreams > $INPUT.out
-rm -f DNA.JV2.jc DNA.JV2.jc.jd N.JV2.bz2 HEADERS.JV2.bbb QUALITIES.JV2.bbb
+rm -f DNA.JV2.jc DNA.JV2.tar.out N.JV2.bz2 HEADERS.JV2.bbb QUALITIES.JV2.bbb
 #

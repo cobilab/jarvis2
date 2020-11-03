@@ -24,7 +24,7 @@
 #define MAX_CTX      20       // ((HASH_SIZE (24 B) + KEY (16 B))>>1) = 20 
 
 typedef uint8_t      HCP;   
-typedef uint64_t     POS_PREC;   
+typedef uint32_t     POS_PREC;   
 
 #define MAX_HASH_COL ((1<<(sizeof(HCP)*8))-1)
 
