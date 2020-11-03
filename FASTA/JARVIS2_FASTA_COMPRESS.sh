@@ -8,7 +8,7 @@ INPUT="$1";
 [ ! -f $INPUT ] && { echo "$0: file $INPUT not found."; exit 2; }
 #
 ./SplitFastaStreams < $INPUT
-./SplitDNA.sh "DNA.JV2" "10MB" "8" &
+./SplitDNA.sh "DNA.JV2" "20MB" "8" &
 ./bbb cfm10q HEADERS.JV2 HEADERS.JV2.bbb &
 bzip2 -f EXTRA.JV2 &
 wait

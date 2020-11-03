@@ -8,7 +8,7 @@ INPUT="$1";
 [ ! -f $INPUT ] && { echo "$0: file $INPUT not found."; exit 2; }
 #
 tar -xvf $INPUT
-./JARVIS2 -f -d DNA.JV2.jc &
+./MergeDNA.sh "DNA.JV2.tar" "20MB" "8" &
 bunzip2 -f EXTRA.JV2.bz2 &
 ./bbb -fqd HEADERS.JV2.bbb HEADERS.JV2 &
 wait

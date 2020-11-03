@@ -17,7 +17,7 @@ D_NAMES="";
 #
 for file in "${FILES[@]}" #
   do
-  ./JARVIS2 -d $file &
+  ./JARVIS2 -d $file 2> .tmp_report_$file &
   if [[ "$IDX" -eq "$THREADS" ]] || [[ "${#FILES[@]}" -eq "$IDX" ]]
     then
     wait;
@@ -29,9 +29,9 @@ rm -f $INPUT.out;
 for file in "${FILES[@]}" #
   do
   cat $file.jd >> $INPUT.out;
-  rm -f $file.jd $file;
+  rm -f $file.jd $file .tmp_report_$file
   done
 #
-rm -f .DEC_F_JV2
+rm -f .DEC_F_JV2 
 #
 # ==============================================================================

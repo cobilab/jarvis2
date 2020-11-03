@@ -7,7 +7,7 @@ INPUT="$1";
 # Make sure file exits else die
 [ ! -f $INPUT ] && { echo "$0: file $INPUT not found."; exit 2; }
 #
-tar -xvf $INPUT
+tar -xvf $INPUT 1> .rep_main_info;
 ./bbb dqf HEADERS.JV2.bbb HEADERS.JV2 &
 ./MergeDNA.sh "DNA.JV2.tar" "10MB" "8" &
 bunzip2 -f N.JV2.bz2 &
@@ -15,5 +15,5 @@ bunzip2 -f N.JV2.bz2 &
 wait
 mv DNA.JV2.tar.out DNA.JV2
 ./MergeFastqStreams > $INPUT.out
-rm -f DNA.JV2.jc DNA.JV2.tar.out N.JV2.bz2 HEADERS.JV2.bbb QUALITIES.JV2.bbb
+rm -f DNA.JV2.jc DNA.JV2.tar.out N.JV2.bz2 HEADERS.JV2.bbb QUALITIES.JV2.bbb .rep_main_info;
 #

@@ -13,13 +13,14 @@ bzip2 -f N.JV2 &
 ./bbb cfm10q HEADERS.JV2 HEADERS.JV2.bbb &
 ./bbb cfm10q QUALITIES.JV2 QUALITIES.JV2.bbb &
 wait
-tar -cvf $INPUT.tar DNA.JV2.tar N.JV2.bz2 HEADERS.JV2.bbb QUALITIES.JV2.bbb
+tar -cvf $INPUT.tar DNA.JV2.tar N.JV2.bz2 HEADERS.JV2.bbb QUALITIES.JV2.bbb 1> .rep_main_info;
 #
 ls -lah HEADERS.JV2.bbb | awk '{ print "HEADS:\t"$5; }'
 ls -lah DNA.JV2.tar | awk '{ print "DNA:\t"$5; }'
 ls -lah N.JV2.bz2 | awk '{ print "Ns:\t"$5; }'
 ls -lah QUALITIES.JV2.bbb | awk '{ print "QUALS:\t"$5; }'
+echo "------";
 ls -lah $INPUT.tar | awk '{ print "TOTAL:\t"$5; }'
 #
-rm -f DNA.JV2 N.JV2 HEADERS.JV2 QUALITIES.JV2
+rm -f DNA.JV2 N.JV2 HEADERS.JV2 QUALITIES.JV2 .rep_main_info;
 #
