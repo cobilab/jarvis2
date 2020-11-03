@@ -29,6 +29,7 @@ rm -f $INPUT.out;
 for file in "${FILES[@]}" #
   do
   cat $file.jd >> $INPUT.out;
+  rm -f $file.jd $file;
   done
 #
 rm -f .DEC_F_JV2

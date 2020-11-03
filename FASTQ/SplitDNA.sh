@@ -28,6 +28,10 @@ for file in "${FILES[@]}" #
   done
 #
 tar -cvf $INPUT.tar $C_NAMES; 
+for file in "${FILES[@]}" #
+  do
+  rm -f $file.jc $file;
+  done
 #
 rm -f .ENC_F_JV2;
 #
