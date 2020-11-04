@@ -208,7 +208,7 @@ if [[ "$DECOMPRESS" -eq "0" ]];
   #
   echo "Decompressing data ...";
   tar -xvf $INPUT 1> .rep_out_dec
-  ./MergeDNA.sh "DNA.JV2.tar" "70MB" "8" &
+  ./MergeDNA.sh "DNA.JV2.tar" "$THREADS" &
   ./bzip2 -d -f EXTRA.JV2.bz2 &
   ./bbb -fqd HEADERS.JV2.bbb HEADERS.JV2 &
   wait
