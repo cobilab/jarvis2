@@ -22,6 +22,7 @@ for file in "${FILES[@]}" #
   if [[ "$IDX" -eq "$THREADS" ]] || [[ "${#FILES[@]}" -eq "$IDX" ]]
     then
     wait;
+    IDX=1;
     fi
   C_NAMES+=" $file.jc ";
   ((++IDX));
