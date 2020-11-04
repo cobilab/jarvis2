@@ -31,7 +31,7 @@ SHOW_MENU () {
   echo "                                                        ";
   echo " Example -----------------------------------------------";
   echo "                                                        ";
-  echo " ./JARVIS2_FASTA.sh --block 10MB --threads 8 -i test.fa ";
+  echo " ./JARVIS2_FASTA.sh --block 10MB -t 8 -i sample.fa      ";
   echo "                                                        ";
   echo " -------------------------------------------------------";
   }
