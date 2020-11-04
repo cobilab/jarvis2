@@ -3,6 +3,7 @@
 HELP=0;
 ABOUT=0;
 DECOMPRESS=0;
+INSTALL=0;
 BLOCK="20MB";
 THREADS="8";
 #
@@ -15,6 +16,7 @@ SHOW_MENU () {
   echo "                                                        ";
   echo " -h, --help                   Show this,                ";
   echo " -a, --about                  Show program information, ";
+  echo " -c, --install                Install/compile programs, ";
   echo "                                                        ";
   echo " -b <INT>, --block <INT>      Block size to be splitted,";
   echo " -t <INT>, --threads <INT>    Number of JARVIS2 threads,";
@@ -81,6 +83,10 @@ while [[ $# -gt 0 ]]
       ABOUT=1;
       shift
     ;;
+    -c|--install|--compile)
+      INSTALL=1;
+      shift
+    ;;
     -d|--decompress|--uncompress|--decompression)
       DECOMPRESS=1;
       shift
@@ -125,6 +131,22 @@ if [[ "$ABOUT" -eq "1" ]];
 #  
 ################################################################################
 #
+if [[ "$INSTALL" -eq "1" ]];
+  then
+  echo "Running installation ...";
+  gcc bzip2.c -o bzip2
+  g++ bbb.cpp -o bbb
+  make;
+  cd ../src/
+  make
+  cp JARVIS2 ../FASTA/
+  cd ../FASTA
+  echo "Done!"; 
+  exit;
+  fi
+#
+################################################################################
+#
 if [[ "$DECOMPRESS" -eq "0" ]];
   then
   # COMPRESSION
@@ -137,7 +159,7 @@ if [[ "$DECOMPRESS" -eq "0" ]];
   ./SplitFastaStreams < $INPUT
   ./SplitDNA.sh "DNA.JV2" "$BLOCK" "$THREADS" &
   ./bbb cfm10q HEADERS.JV2 HEADERS.JV2.bbb &
-  bzip2 -f EXTRA.JV2 &
+  ./bzip2 -f EXTRA.JV2 &
   wait
   #
   tar -cvf $INPUT.tar DNA.JV2.tar EXTRA.JV2.bz2 HEADERS.JV2.bbb 1> .rep_out_enc
@@ -161,7 +183,7 @@ if [[ "$DECOMPRESS" -eq "0" ]];
   echo "Decompressing ...";
   tar -xvf $INPUT 1> .rep_out_dec
   ./MergeDNA.sh "DNA.JV2.tar" "70MB" "8" &
-  bunzip2 -f EXTRA.JV2.bz2 &
+  ./bzip2 -d -f EXTRA.JV2.bz2 &
   ./bbb -fqd HEADERS.JV2.bbb HEADERS.JV2 &
   wait
   mv DNA.JV2.tar.out DNA.JV2
