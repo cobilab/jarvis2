@@ -14,10 +14,10 @@ make
 
 #### Run JARVIS2 ####
 
-Run JARVIS2 using level 4:
+Run JARVIS2 using level 9:
 
 <pre>
-./JARVIS2 -v -l 4 File.seq
+./JARVIS2 -v -l 9 File.seq
 </pre>
 
 ### Parameters ###
@@ -96,54 +96,40 @@ To see the possible levels (automatic choosen compression parameters), type:
 
 #### Compression of FASTA data ####
 
-It is required to have the following tool installed:
-<pre>
-sudo apt-get install -y bzip2
-</pre>
-
-Preparing FASTA compression setup:
+Preparing JARVIS2 for FASTA:
 <pre>
 cd FASTA/
 chmod +x *.sh
-make
-g++ bbb.cpp -o bbb
-cp ../src/JARVIS2 .
+./JARVIS2_FASTA --install
 </pre>
 
 Compression:
 <pre>
-./JARVIS2_FASTA_COMPRESS.sh file.fa
+./JARVIS2_FASTA.sh --threads 8 --block 10MB --input sample.fa
 </pre>
 
 Decompression:
 <pre>
-./JARVIS2_FASTA_DECOMPRESS.sh file.fa.tar
+./JARVIS2_FASTA.sh --decompress --threads 4 --input sample.fa.tar
 </pre>
 
 #### Compression of FASTQ data ####
 
-It is required to have the following tool installed:
-<pre>
-sudo apt-get install -y bzip2
-</pre>
-
-Preparing FASTQ compression setup:
+Preparing JARVIS2 for FASTQ:
 <pre>
 cd FASTQ/
 chmod +x *.sh
-make
-g++ bbb.cpp -o bbb
-cp ../src/JARVIS2 .
+./JARVIS2_FASTQ --install
 </pre>
 
 Compression:
 <pre>
-./JARVIS2_FASTQ_COMPRESS.sh file.fastq
+./JARVIS2_FASTQ.sh --threads 8 --block 40MB --input sample.fq
 </pre>
 
 Decompression:
 <pre>
-./JARVIS2_FASTQ_DECOMPRESS.sh file.fastq.tar
+./JARVIS2_FASTQ.sh --decompress --threads 4 --input sample.fq.tar
 </pre>
 
 ### Citation ###
