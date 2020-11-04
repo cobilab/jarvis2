@@ -201,6 +201,8 @@ if [[ "$DECOMPRESS" -eq "0" ]];
   else 
   # DECOMPRESSION:
   # 
+  echo "Number of threads: $THREADS";
+  #
   # Make sure file exits else die
   CHECK_INPUT "$INPUT";
   #
