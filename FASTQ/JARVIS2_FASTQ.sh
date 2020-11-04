@@ -31,7 +31,8 @@ SHOW_MENU () {
   echo "                                                        ";
   echo " Example -----------------------------------------------";
   echo "                                                        ";
-  echo " ./JARVIS2_FASTQ.sh --block 50MB --threads 8 -i test.fq ";
+  echo " ./JARVIS2_FASTQ.sh --block 50MB -t 8 -i sample.fq      ";
+  echo " ./JARVIS2_FASTQ.sh --decompress -t 4 -i sample.fq.tar  ";
   echo "                                                        ";
   echo " -------------------------------------------------------";
   }
