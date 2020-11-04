@@ -154,8 +154,8 @@ if [[ "$INSTALL" -eq "1" ]];
   make;
   cd ../src/
   make
-  cp JARVIS2 ../FASTA/
-  cd ../FASTA
+  cp JARVIS2 ../FASTQ/
+  cd ../FASTQ
   echo "Done!"; 
   exit;
   fi
