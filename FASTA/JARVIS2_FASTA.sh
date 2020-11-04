@@ -32,6 +32,7 @@ SHOW_MENU () {
   echo " Example -----------------------------------------------";
   echo "                                                        ";
   echo " ./JARVIS2_FASTA.sh --block 10MB -t 8 -i sample.fa      ";
+  echo " ./JARVIS2_FASTA.sh --decompress -t 4 -i sample.fa.tar  ";
   echo "                                                        ";
   echo " -------------------------------------------------------";
   }
