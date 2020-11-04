@@ -20,6 +20,7 @@ for file in "${FILES[@]}" #
   if [[ "$IDX" -eq "$THREADS" ]] || [[ "${#FILES[@]}" -eq "$IDX" ]]
     then
     wait;
+    IDX=0;
     fi
   ((++IDX));  
   done
