@@ -4,7 +4,7 @@ HELP=0;
 ABOUT=0;
 DECOMPRESS=0;
 INSTALL=0;
-BLOCK="20MB";
+BLOCK="50MB";
 THREADS="8";
 #
 ################################################################################
@@ -12,7 +12,7 @@ THREADS="8";
 SHOW_MENU () {
   echo " -------------------------------------------------------";
   echo "                                                        ";
-  echo " JARVIS2, v1.0 - FASTA / Multi-FASTA Extension          ";
+  echo " JARVIS2, v1.0 - FASTQ Extension                        ";
   echo "                                                        ";
   echo " Program options ---------------------------------------";
   echo "                                                        ";
@@ -27,11 +27,11 @@ SHOW_MENU () {
   echo "                                                        ";
   echo " Input options -----------------------------------------";
   echo "                                                        ";
-  echo " -i <FILE>, --input <FILE>    Input FASTA filename.     ";
+  echo " -i <FILE>, --input <FILE>    Input FASTQ filename.     ";
   echo "                                                        ";
   echo " Example -----------------------------------------------";
   echo "                                                        ";
-  echo " ./JARVIS2_FASTA.sh --block 10MB --threads 8 -i test.fa ";
+  echo " ./JARVIS2_FASTQ.sh --block 50MB --threads 8 -i test.fq ";
   echo "                                                        ";
   echo " -------------------------------------------------------";
   }
@@ -57,7 +57,7 @@ Program_installed () {
   if ! [ -x "$(command -v $1)" ];
     then
     echo -e "\e[41mERROR\e[49m: $1 is not installed." >&2;
-    echo -e "\e[42mTIP\e[49m: Try: ./JARVIS2_FASTA.sh --install" >&2;
+    echo -e "\e[42mTIP\e[49m: Try: ./JARVIS2_FASTQ.sh --install" >&2;
     exit 1;
     fi
   }
@@ -66,7 +66,7 @@ Program_installed () {
 #
 SHOW_HEADER () {
   echo "                                                        ";
-  echo " [JARVIS2 :: FASTA Extension]                           ";
+  echo " [JARVIS2 :: FASTQ Extension]                           ";
   echo "                                                        ";
   echo " Release year: 2021,                                    ";
   echo " Version: 1.0                                           ";
@@ -119,7 +119,7 @@ while [[ $# -gt 0 ]]
     ;;
     -*) # unknown option with small
     echo "Invalid arg ($1)!";
-    echo "For help, try: ./JARVIS2_FASTA.sh -h"
+    echo "For help, try: ./JARVIS2_FASTQ.sh -h"
     exit 1;
     ;;
   esac
@@ -167,7 +167,7 @@ if [[ "$DECOMPRESS" -eq "0" ]];
   #
   CHECK_INPUT "$INPUT";
   #
-  Program_installed "./SplitFastaStreams";
+  Program_installed "./SplitFastqStreams";
   Program_installed "./bbb";
   Program_installed "./bzip2";
   Program_installed "./JARVIS2";
@@ -176,22 +176,25 @@ if [[ "$DECOMPRESS" -eq "0" ]];
   echo "Number of threads: $THREADS";
   echo "Compressing data ...";
   #
-  ./SplitFastaStreams < $INPUT
+  ./SplitFastqStreams < $INPUT
   ./SplitDNA.sh "DNA.JV2" "$BLOCK" "$THREADS" &
+  ./bzip2 -f N.JV2 &
   ./bbb cfm10q HEADERS.JV2 HEADERS.JV2.bbb &
-  ./bzip2 -f EXTRA.JV2 &
+  ./bbb cfm10q QUALITIES.JV2 QUALITIES.JV2.bbb &
   wait
   #
-  tar -cvf $INPUT.tar DNA.JV2.tar EXTRA.JV2.bz2 HEADERS.JV2.bbb 1> .rep_out_enc
+  tar -cvf $INPUT.tar DNA.JV2.tar N.JV2.bz2 HEADERS.JV2.bbb QUALITIES.JV2.bbb 1> .rep_main_info;
   #
   echo "Done!";
+  #
   ls -lah HEADERS.JV2.bbb | awk '{ print "HEADS:\t"$5; }'
   ls -lah DNA.JV2.tar | awk '{ print "DNA:\t"$5; }'
-  ls -lah EXTRA.JV2.bz2 | awk '{ print "EXTRA:\t"$5; }'
+  ls -lah N.JV2.bz2 | awk '{ print "Ns:\t"$5; }'
+  ls -lah QUALITIES.JV2.bbb | awk '{ print "QUALS:\t"$5; }'
   echo "------";
   ls -lah $INPUT.tar | awk '{ print "TOTAL:\t"$5; }'
   #
-  rm -f DNA.JV2.tar EXTRA.JV2 HEADERS.JV2 .rep_out_enc
+  rm -f DNA.JV2 N.JV2 HEADERS.JV2 QUALITIES.JV2 .rep_main_info;
   #
   echo "Compressed file: $INPUT.tar";
   #
@@ -201,22 +204,23 @@ if [[ "$DECOMPRESS" -eq "0" ]];
   # Make sure file exits else die
   CHECK_INPUT "$INPUT";
   #
-  Program_installed "./MergeFastaStreams";
+  Program_installed "./MergeFastqStreams";
   Program_installed "./bbb";
   Program_installed "./bzip2";
   Program_installed "./JARVIS2";
   #
   echo "Decompressing data ...";
-  tar -xvf $INPUT 1> .rep_out_dec
-  ./MergeDNA.sh "DNA.JV2.tar" "70MB" "8" &
-  ./bzip2 -d -f EXTRA.JV2.bz2 &
-  ./bbb -fqd HEADERS.JV2.bbb HEADERS.JV2 &
+  tar -xvf $INPUT 1> .rep_main_info;
+  ./bbb dqf HEADERS.JV2.bbb HEADERS.JV2 &
+  ./MergeDNA.sh "DNA.JV2.tar" "$THREADS" &
+  ./bzip2 -d -f N.JV2.bz2 &
+  ./bbb dqf QUALITIES.JV2.bbb QUALITIES.JV2 &
   wait
+  #
   mv DNA.JV2.tar.out DNA.JV2
-  ./MergeFastaStreams > $INPUT.out
-  rm -f DNA.JV2.jc DNA.JV2.tar.out EXTRA.JV2.bz2 HEADERS.JV2.bbb .rep_out_dec
-  echo "Done!";
-  echo "Decompressed file: $INPUT.out";
+  ./MergeFastqStreams > $INPUT.out
+  #
+  rm -f DNA.JV2.jc DNA.JV2.tar.out N.JV2.bz2 HEADERS.JV2.bbb QUALITIES.JV2.bbb .rep_main_info;
   #
   fi
 #
