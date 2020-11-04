@@ -7,6 +7,8 @@ INSTALL=0;
 BLOCK="20MB";
 THREADS="8";
 #
+################################################################################
+#
 SHOW_MENU () {
   echo " -------------------------------------------------------";
   echo "                                                        ";
@@ -45,6 +47,18 @@ CHECK_INPUT () {
     echo -e "\e[31mERROR: input file not found!\e[0m";
     SHOW_MENU;
     exit;
+    fi
+  }
+#
+################################################################################
+#
+Program_installed () {
+  # printf "Checking $1 ... ";
+  if ! [ -x "$(command -v $1)" ];
+    then
+    echo -e "\e[41mERROR\e[49m: $1 is not installed." >&2;
+    echo -e "\e[42mTIP\e[49m: Try: ./JARVIS2_FASTA.sh --install" >&2;
+    exit 1;
     fi
   }
 #
@@ -128,7 +142,7 @@ if [[ "$ABOUT" -eq "1" ]];
   SHOW_HEADER;
   exit;
   fi
-#  
+#
 ################################################################################
 #
 if [[ "$INSTALL" -eq "1" ]];
@@ -152,9 +166,15 @@ if [[ "$DECOMPRESS" -eq "0" ]];
   # COMPRESSION
   #
   CHECK_INPUT "$INPUT";
+  #
+  Program_installed "./SplitFastaStreams";
+  Program_installed "./bbb";
+  Program_installed "./bzip2";
+  Program_installed "./JARVIS2";
+  #
   echo "Block size: $BLOCK";
   echo "Number of threads: $THREADS";
-  echo "Compressing ...";
+  echo "Compressing data ...";
   #
   ./SplitFastaStreams < $INPUT
   ./SplitDNA.sh "DNA.JV2" "$BLOCK" "$THREADS" &
@@ -173,6 +193,7 @@ if [[ "$DECOMPRESS" -eq "0" ]];
   #
   rm -f DNA.JV2.tar EXTRA.JV2 HEADERS.JV2 .rep_out_enc
   #
+  echo "Compressed file: $INPUT.tar";
   #
   else 
   # DECOMPRESSION:
@@ -180,7 +201,12 @@ if [[ "$DECOMPRESS" -eq "0" ]];
   # Make sure file exits else die
   CHECK_INPUT "$INPUT";
   #
-  echo "Decompressing ...";
+  Program_installed "./MergeFastaStreams";
+  Program_installed "./bbb";
+  Program_installed "./bzip2";
+  Program_installed "./JARVIS2";
+  #
+  echo "Decompressing data ...";
   tar -xvf $INPUT 1> .rep_out_dec
   ./MergeDNA.sh "DNA.JV2.tar" "70MB" "8" &
   ./bzip2 -d -f EXTRA.JV2.bz2 &
