@@ -8,7 +8,7 @@ THREADS="$3";
 #
 # ==============================================================================
 #
-split --bytes=$SIZE --numeric-suffixes=10 --verbose $INPUT $INPUT- \
+split --bytes=$SIZE --verbose $INPUT $INPUT- \
 | tr -d "\'" | awk '{ print $3;}' > .ENC_F_JV2 2> .tmp_report;
 #
 mapfile -t FILES < .ENC_F_JV2;
