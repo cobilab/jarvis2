@@ -11,18 +11,20 @@ tar -xvf $INPUT 1> .DEC_F_JV2;
 #
 mapfile -t FILES < .DEC_F_JV2;
 #
-IDX=1;
 D_NAMES="";
+IDX_T=1;
+IDX_POS=1;
 #
 for file in "${FILES[@]}" #
   do
   ./JARVIS2 -d $file 2> .tmp_report_$file &
-  if [[ "$IDX" -eq "$THREADS" ]] || [[ "${#FILES[@]}" -eq "$IDX" ]]
+  if [[ "$IDX_T" -eq "$THREADS" ]] || [[ "${#FILES[@]}" -eq "$IDX_POS" ]]
     then
     wait;
-    IDX=0;
+    IDX_T=0;
     fi
-  ((++IDX));  
+  ((++IDX_T));  
+  ((++IDX_POS));  
   done
 #
 rm -f $INPUT.out;
