@@ -14,18 +14,20 @@ split --bytes=$SIZE --verbose $INPUT $INPUT- \
 mapfile -t FILES < .ENC_F_JV2;
 #
 C_NAMES="";
-IDX=1;
+IDX_T=1;
+IDX_POS=1;
 #
 for file in "${FILES[@]}" #
   do
   ./JARVIS2 -l 9 $file 2> .tmp_report_$file &
-  if [[ "$IDX" -eq "$THREADS" ]] || [[ "${#FILES[@]}" -eq "$IDX" ]]
+  if [[ "$IDX_T" -eq "$THREADS" ]] || [[ "${#FILES[@]}" -eq "$IDX_POS" ]]
     then
     wait;
-    IDX=0;
+    IDX_T=0;
     fi
   C_NAMES+=" $file.jc ";
-  ((++IDX));
+  ((++IDX_T));
+  ((++IDX_POS));
   done
 #
 tar -cvf $INPUT.tar $C_NAMES 1>> .tmp_report 2>> .tmp_err; 
