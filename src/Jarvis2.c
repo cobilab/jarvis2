@@ -225,6 +225,13 @@ void Compress(PARAM *P, char *fn){
     }
 
   P->length = NBytesInFile(IN);
+
+  if(P->length > 4294967295){
+    fprintf(stderr, "Error: DNA sequence larger than 2^32.\n");
+    fprintf(stderr, "Tip: Use split to separate data into buckets...\n");
+    exit(1);
+    }
+
   P->size = P->length>>2;
 
   if(P->verbose){
