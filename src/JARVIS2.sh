@@ -272,9 +272,12 @@ if [[ "$ABOUT" -eq "1" ]];
 if [[ "$INSTALL" -eq "1" ]];
   then
   echo "Running installation ...";
+  cd extra/
   make
-  gcc extra/bzip2.c -o bzip2
-  g++ extra/bbb.cpp -o bbb
+  gcc bzip2.c -o bzip2
+  g++ bbb.cpp -o bbb
+  cd ../
+  make
   echo "Done!"; 
   exit;
   fi
