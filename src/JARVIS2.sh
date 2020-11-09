@@ -280,7 +280,7 @@ if [[ "$INSTALL" -eq "1" ]];
   cp SplitFastqStreams ..
   gcc bzip2.c -o bzip2
   g++ bbb.cpp -o bbb
-  cp bzip ..
+  cp bzip2 ..
   cp bbb ..
   cd ../
   make
