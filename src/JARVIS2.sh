@@ -4,6 +4,9 @@ HELP=0;
 ABOUT=0;
 DECOMPRESS=0;
 INSTALL=0;
+SHOW=0;
+TYPE=0;
+LEVEL=9;
 BLOCK="24MB";
 THREADS="8";
 #
@@ -12,16 +15,23 @@ THREADS="8";
 SHOW_MENU () {
   echo " -------------------------------------------------------";
   echo "                                                        ";
-  echo " JARVIS2, v1.0 - DNA Extension {A, C, G, T} only        ";
+  echo " JARVIS2, v1.0 - DNA sequence, FASTA, and FASTQ data.   ";
   echo "                                                        ";
   echo " Program options ---------------------------------------";
   echo "                                                        ";
   echo " -h, --help                   Show this,                ";
   echo " -a, --about                  Show program information, ";
   echo " -c, --install                Install/compile programs, ";
+  echo " -s, --show                   Show compression levels,  ";
   echo "                                                        ";
+  echo " -l <INT>, --level <INT>      JARVIS2 compression level,";
   echo " -b <INT>, --block <INT>      Block size to be splitted,";
   echo " -t <INT>, --threads <INT>    Number of JARVIS2 threads,";
+  echo "                                                        ";
+  echo " -dn, --dna                   Assume DNA sequence type, ";
+  echo " -fa, --fasta                 Assume FASTA data type,   ";
+  echo " -fq, --fastq                 Assume FASTQ data type,   ";
+  echo " -au, --automatic             Detect data type (def),   ";
   echo "                                                        ";
   echo " -d, --decompress             Decompression mode,       ";
   echo "                                                        ";
@@ -66,7 +76,7 @@ Program_installed () {
 #
 SHOW_HEADER () {
   echo "                                                        ";
-  echo " [JARVIS2 :: DNA Extension]                             ";
+  echo " [JARVIS2 :: DNA, FASTA, and FASTQ Extensions]          ";
   echo "                                                        ";
   echo " Release year: 2021,                                    ";
   echo " Version: 1.0                                           ";
@@ -75,6 +85,88 @@ SHOW_HEADER () {
   echo " License: GPL v3                                        ";
   echo "                                                        ";
   }
+#
+################################################################################
+#
+SHOW_LEVELS () {
+  ./JARVIS2 -s
+  }
+#
+################################################################################
+#
+MERGE_DNA () {
+  INPUT="$1";    # "Filename"
+  THREADS="$2";  # "8"
+  #
+  tar -xvf $INPUT 1> .DEC_F_JV2;
+  #
+  mapfile -t FILES < .DEC_F_JV2;
+  #
+  D_NAMES="";
+  IDX_T=1;
+  IDX_POS=1;
+  #
+  for file in "${FILES[@]}" #
+    do
+    ./JARVIS2 -d $file 2> .tmp_report_$file &
+    if [[ "$IDX_T" -eq "$THREADS" ]] || [[ "${#FILES[@]}" -eq "$IDX_POS" ]]
+      then
+      wait;
+      IDX_T=0;
+      fi
+    ((++IDX_T));
+    ((++IDX_POS));
+    done
+  #
+  rm -f $INPUT.out;
+  for file in "${FILES[@]}" #
+    do
+    cat $file.jd >> $INPUT.out;
+    rm -f $file.jd $file .tmp_report_$file
+    done
+  #
+  rm -f .DEC_F_JV2
+  }
+#
+################################################################################
+#
+SPLIT_DNA () {
+  #
+  INPUT="$1";
+  SIZE="$2";
+  THREADS="$3";
+  LEVEL="$4";
+  #
+  split --bytes=$SIZE --verbose $INPUT $INPUT- \
+  | tr -d "\'" | awk '{ print $3;}' > .ENC_F_JV2 2> .tmp_report;
+  #
+  mapfile -t FILES < .ENC_F_JV2;
+  #
+  C_NAMES="";
+  IDX_T=1;
+  IDX_POS=1;
+  #
+  for file in "${FILES[@]}" #
+    do
+    ./JARVIS2 -l $LEVEL $file 2> .tmp_report_$file &
+    if [[ "$IDX_T" -eq "$THREADS" ]] || [[ "${#FILES[@]}" -eq "$IDX_POS" ]]
+      then
+      wait;
+      IDX_T=0;
+      fi
+    C_NAMES+=" $file.jc ";
+    ((++IDX_T));
+    ((++IDX_POS));
+    done
+  #
+  tar -cvf $INPUT.tar $C_NAMES 1>> .tmp_report 2>> .tmp_err;
+  for file in "${FILES[@]}" #
+    do
+    rm -f $file.jc $file .tmp_report_$file;
+    done
+  #
+  rm -f .ENC_F_JV2 .tmp_report .tmp_err;
+  }	
 #
 ################################################################################
 #
@@ -105,13 +197,37 @@ while [[ $# -gt 0 ]]
       DECOMPRESS=1;
       shift
     ;;
+    -l|--level|--compression-level|--jarvis2-level|--mode)
+      LEVEL="$2";
+      shift 2;
+    ;;
     -b|--block)
       BLOCK="$2";
       shift 2;
     ;;
+    -dn|--dna|--adn|--DNA|--genomic)
+      TYPE=1;
+      shift 1;
+    ;;
+    -fa|--fas|--fasta|--FASTA|--Fasta)
+      TYPE=2;
+      shift 1;
+    ;;
+    -fq|--faq|--fastq|--FASTQ|--Fastq)
+      TYPE=3;
+      shift 1;
+    ;;
+    -au|--automatic|--automat|--auto)
+      TYPE=0;
+      shift 1;
+    ;;
     -t|--threads)
       THREADS="$2";
       shift 2;
+    ;;
+    -s|--show)
+      SHOW=1;
+      shift;
     ;;
     -i|--input)
       INPUT="$2";
@@ -137,6 +253,14 @@ if [[ "$HELP" -eq "1" ]];
 #
 ################################################################################
 #
+if [[ "$SHOW" -eq "1" ]];
+  then
+  SHOW_LEVELS;
+  exit;
+  fi
+#
+################################################################################
+#
 if [[ "$ABOUT" -eq "1" ]];
   then
   SHOW_HEADER;
@@ -149,6 +273,8 @@ if [[ "$INSTALL" -eq "1" ]];
   then
   echo "Running installation ...";
   make
+  gcc extra/bzip2.c -o bzip2
+  g++ extra/bbb.cpp -o bbb
   echo "Done!"; 
   exit;
   fi
@@ -163,19 +289,61 @@ if [[ "$DECOMPRESS" -eq "0" ]];
   #
   Program_installed "./JARVIS2";
   #
-  echo "Block size: $BLOCK";
+  if [[ "$TYPE" -eq "0" ]];
+    then
+    FIRST=`head -c 1 < $INPUT`;
+    if [[ "$FIRST" = ">" ]];
+      then 
+      TYPE=2;
+      elif [[ "$FIRST" = "@" ]];
+      then
+      TYPE=3;
+      else
+      TYPE=1;
+      fi
+    fi
+  #
+  declare -a TYPE_NAME=("other" "DNA sequence" "FASTA" "FASTQ");  
+  #
+  echo "Running data type: ${TYPE_NAME[$TYPE]}";
+  echo "Maximum Blocksize: $BLOCK";
   echo "Number of threads: $THREADS";
+  echo "Compression level: $LEVEL";
   echo "Compressing data ...";
   #
-  ./SplitDNA.sh "$INPUT" "$BLOCK" "$THREADS" &
-  wait
-  #
-  echo "Done!";
-  ls -lah $INPUT.tar | awk '{ print "TOTAL:\t"$5; }'
-  #
-  rm -f DNA.JV2.tar .rep_out_enc
-  #
-  echo "Compressed file: $INPUT.tar";
+  if [[ "$TYPE" -eq "1" ]]; # DNA SEQUENCE =====================================
+    then
+    #
+    SPLIT_DNA "$INPUT" "$BLOCK" "$THREADS" "$LEVEL"
+    wait
+    echo "Done!";
+    ls -lah $INPUT.tar | awk '{ print "TOTAL:\t"$5; }'
+    rm -f DNA.JV2.tar .rep_out_enc
+    echo "Compressed file: $INPUT.tar";
+    #
+    elif [[ "$TYPE" -eq "2" ]]; # FASTA DATA ===================================
+    then
+    #
+    ./SplitFastaStreams < $INPUT
+    SPLIT_DNA "DNA.JV2" "$BLOCK" "$THREADS" "$LEVEL" &
+    ./bbb cfm10q HEADERS.JV2 HEADERS.JV2.bbb &
+    ./bzip2 -f EXTRA.JV2 &
+    wait
+    tar -cvf $INPUT.tar DNA.JV2.tar EXTRA.JV2.bz2 HEADERS.JV2.bbb 1> .rep_out_ec
+    echo "Done!";
+    ls -lah HEADERS.JV2.bbb | awk '{ print "HEADS:\t"$5; }'
+    ls -lah DNA.JV2.tar | awk '{ print "DNA:\t"$5; }'
+    ls -lah EXTRA.JV2.bz2 | awk '{ print "EXTRA:\t"$5; }'
+    echo "------";
+    ls -lah $INPUT.tar | awk '{ print "TOTAL:\t"$5; }'
+    rm -f DNA.JV2.tar EXTRA.JV2 HEADERS.JV2 .rep_out_ec
+    echo "Compressed file: $INPUT.tar";
+    #
+    else # FASTQ DATA ==========================================================
+    #
+    echo "xxxx";
+    #	    
+    fi
   #
   else 
   # DECOMPRESSION:
@@ -186,7 +354,7 @@ if [[ "$DECOMPRESS" -eq "0" ]];
   Program_installed "./JARVIS2";
   #
   echo "Decompressing data ...";
-  ./MergeDNA.sh "$INPUT" "$THREADS" &
+  MERGE_DNA "$INPUT" "$THREADS"
   wait
   echo "Done!";
   echo "Decompressed file: $INPUT.out";
