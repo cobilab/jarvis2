@@ -274,8 +274,14 @@ if [[ "$INSTALL" -eq "1" ]];
   echo "Running installation ...";
   cd extra/
   make
+  cp MergeFastaStreams ..
+  cp MergeFastqStreams ..
+  cp SplitFastaStreams ..
+  cp SplitFastqStreams ..
   gcc bzip2.c -o bzip2
   g++ bbb.cpp -o bbb
+  cp bzip ..
+  cp bbb ..
   cd ../
   make
   echo "Done!"; 
@@ -327,6 +333,10 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     elif [[ "$TYPE" -eq "2" ]]; # FASTA DATA ===================================
     then
     #
+    Program_installed "./SplitFastaStreams";
+    Program_installed "./bbb";
+    Program_installed "./bzip2";
+    Program_installed "./JARVIS2";
     ./SplitFastaStreams < $INPUT
     SPLIT_DNA "DNA.JV2" "$BLOCK" "$THREADS" "$LEVEL" &
     ./bbb cfm10q HEADERS.JV2 HEADERS.JV2.bbb &
@@ -344,7 +354,27 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     #
     else # FASTQ DATA ==========================================================
     #
-    echo "xxxx";
+    echo "HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE";
+    Program_installed "./SplitFastqStreams";
+    Program_installed "./bbb";
+    Program_installed "./bzip2";
+    Program_installed "./JARVIS2";
+    ./SplitFastqStreams < $INPUT
+    SPLIT_DNA "DNA.JV2" "$BLOCK" "$THREADS" "$LEVEL" &
+    ./bzip2 -f N.JV2 &
+    ./bbb cfm10q HEADERS.JV2 HEADERS.JV2.bbb &
+    ./bbb cfm10q QUALITIES.JV2 QUALITIES.JV2.bbb &
+    wait
+    tar -cvf $INPUT.tar DNA.JV2.tar N.JV2.bz2 HEADERS.JV2.bbb QUALITIES.JV2.bbb 1> .rep_main_info;
+    echo "Done!";
+    ls -lah HEADERS.JV2.bbb | awk '{ print "HEADS:\t"$5; }'
+    ls -lah DNA.JV2.tar | awk '{ print "DNA:\t"$5; }'
+    ls -lah N.JV2.bz2 | awk '{ print "Ns:\t"$5; }'
+    ls -lah QUALITIES.JV2.bbb | awk '{ print "QUALS:\t"$5; }'
+    echo "------";
+    ls -lah $INPUT.tar | awk '{ print "TOTAL:\t"$5; }'
+    rm -f DNA.JV2 N.JV2 HEADERS.JV2 QUALITIES.JV2 .rep_main_info;
+    echo "Compressed file: $INPUT.tar";
     #	    
     fi
   #
@@ -354,14 +384,55 @@ if [[ "$DECOMPRESS" -eq "0" ]];
   # Make sure file exits else die
   CHECK_INPUT "$INPUT";
   #
-  Program_installed "./JARVIS2";
-  #
-  echo "Decompressing data ...";
-  MERGE_DNA "$INPUT" "$THREADS"
-  wait
-  echo "Done!";
-  echo "Decompressed file: $INPUT.out";
-  #
+  if [[ "$TYPE" -eq "1" ]]; # DNA SEQUENCE =====================================
+    then
+    Program_installed "./JARVIS2";
+    #
+    echo "Decompressing data ...";
+    MERGE_DNA "$INPUT" "$THREADS"
+    wait
+    echo "Done!";
+    echo "Decompressed file: $INPUT.out";
+    #
+    elif [[ "$TYPE" -eq "2" ]]; # FASTA DATA ===================================
+    then
+    #
+    echo "Number of threads: $THREADS";
+    Program_installed "./MergeFastaStreams";
+    Program_installed "./bbb";
+    Program_installed "./bzip2";
+    Program_installed "./JARVIS2";
+    echo "Decompressing data ...";
+    tar -xvf $INPUT 1> .rep_out_dec
+    MERGE_DNA "DNA.JV2.tar" "$THREADS" &
+    ./bzip2 -d -f EXTRA.JV2.bz2 &
+    ./bbb -fqd HEADERS.JV2.bbb HEADERS.JV2 &
+    wait
+    mv DNA.JV2.tar.out DNA.JV2
+    ./MergeFastaStreams > $INPUT.out
+    rm -f DNA.JV2.jc DNA.JV2.tar.out EXTRA.JV2.bz2 HEADERS.JV2.bbb .rep_out_dec
+    echo "Done!";
+    echo "Decompressed file: $INPUT.out";
+    #
+    else # FASTQ DATA ==========================================================
+    #
+    echo "Number of threads: $THREADS";
+    Program_installed "./MergeFastqStreams";
+    Program_installed "./bbb";
+    Program_installed "./bzip2";
+    Program_installed "./JARVIS2";
+    echo "Decompressing data ...";
+    tar -xvf $INPUT 1> .rep_main_info;
+    ./bbb dqf HEADERS.JV2.bbb HEADERS.JV2 &
+    MERGE_DNA "DNA.JV2.tar" "$THREADS" &
+    ./bzip2 -d -f N.JV2.bz2 &
+    ./bbb dqf QUALITIES.JV2.bbb QUALITIES.JV2 &
+    wait
+    mv DNA.JV2.tar.out DNA.JV2
+    ./MergeFastqStreams > $INPUT.out
+    rm -f DNA.JV2.jc DNA.JV2.tar.out N.JV2.bz2 HEADERS.JV2.bbb QUALITIES.JV2.bbb .rep_main_info;
+    #
+    fi
   fi
 #
 ################################################################################
