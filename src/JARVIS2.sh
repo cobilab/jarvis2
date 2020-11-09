@@ -354,7 +354,6 @@ if [[ "$DECOMPRESS" -eq "0" ]];
     #
     else # FASTQ DATA ==========================================================
     #
-    echo "HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE";
     Program_installed "./SplitFastqStreams";
     Program_installed "./bbb";
     Program_installed "./bzip2";
