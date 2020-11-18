@@ -23,12 +23,18 @@ if [[ "$INSTALL" -eq "0" ]];
   #
   git clone https://github.com/mariusmni/lfqc # LFQC
   #
+  git clone --recursive https://github.com/GATB/leon.git
+  cd leon
+  sh INSTALL
+  #
   fi
 #
 # ==============================================================================
 #
 declare -a DATASET=("SRR12175231" "SRR12175232" "SRR12175233" "SRR12175234"
                 "SRR12175235" "SRR327342" "ERP001775" "ERR174310" "SRR1284073");
+
+# SRR3190692: long read -> 11 GB
 #
 # ==============================================================================
 # DOWNLOAD READS:
@@ -37,7 +43,8 @@ if [[ "$DOWNLOAD" -eq "0" ]];
   then
   for file in "${DATASET[@]}"
     do
-    fastq-dump $file
+    fastq-dump --bzip2 $file
+    bunzip2 $file.fastq.bz2
     awk -v count="1" '++count==4{$0="+" count=0} 1' $file.fastq > $file.fq
     rm -f $file.fastq;
     done
@@ -50,8 +57,12 @@ if [[ "$BENCHMARK" -eq "0" ]];
   for file in "${DATASET[@]}"
     do
     echo "Running $file ...";
-    (time ./JARVIS2.sh --level $LEVEL --block 24MB --threads 8 --input $file ) 2> Report_JARVIS2_$file
-    (time spring -c -i SRR12175232.f -o file.spring ) 2> Report_SPRING_$file
+    # RAM = 9GB
+    (time ./JARVIS2.sh --level $LEVEL --block 24MB --threads 8 --input $file.fq ) 2> Report_JARVIS2_$file
+    (time spring -c -i $file.fq -o $file.spring ) 2> Report_SPRING_$file
+    #
+    # RAM = 8GB
+    (time fqz_comp -n2 -q3 -s8+ -e -b < $file.fq > $file.fqz ) 2> Report_SPRING_$file
     done
   fi
 #
