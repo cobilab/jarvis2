@@ -83,7 +83,7 @@ uint32_t garbage;
 #define DEFAULT_LEVEL          4
 #define DEFAULT_HS             40
 #define DEFAULT_LR             0.03
-#define MAX_LEVEL              16
+#define MAX_LEVEL              22
 #define MIN_LEVEL              1
 #define MAX_CTX                20
 #define MIN_CTX                1
