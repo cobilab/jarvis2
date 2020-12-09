@@ -61,6 +61,8 @@ void PrintLevels(void){
   fprintf(stderr, "Level%s\n", LEVEL_20);
   fprintf(stderr, "Level%s\n", LEVEL_21);
   fprintf(stderr, "Level%s\n", LEVEL_22);
+  fprintf(stderr, "Level%s\n", LEVEL_23);
+  fprintf(stderr, "Level%s\n", LEVEL_24);
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
