@@ -110,13 +110,7 @@ void PrintMenu(void){
   "                                                                   \n"
   "NAME                                                               \n"
   "      JARVIS2 v%u.%u,                                              \n"
-  "      Efficient lossless compression of genomic sequences          \n"
-  "                                                                   \n"
-  "AUTHORS                                                            \n"
-  "      D. Pratas         pratas@ua.pt                               \n"
-  "      M. Silva          teixeirasilva@ua.pt                        \n"
-  "      J. M. Silva       jorge.miguel.ferreira.silva@ua.pt          \n"
-  "      A. J. Pinho       ap@ua.pt                                   \n"
+  "      High-ratio lossless compression of genome sequences          \n"
   "                                                                   \n"
   "SYNOPSIS                                                           \n"
   "      ./JARVIS2 [OPTION]... [FILE]                                 \n"
@@ -127,7 +121,7 @@ void PrintMenu(void){
   "                                                                   \n"
   "DESCRIPTION                                                        \n"
   "      Lossless compression and decompression of genomic            \n"
-  "      sequences for efficient storage and analysis purposes.       \n"
+  "      sequences for miniaml storage and analysis purposes.         \n"
   "      Measure an upper bound of the sequence complexity.           \n"
   "                                                                   \n"
   "      -h,  --help                                                  \n"
@@ -170,7 +164,7 @@ void PrintMenu(void){
   "           resources (RAM & time). Use -s for levels perception.   \n",
   DEFAULT_LEVEL);
 
-  // ModelsExplanation();
+  //ModelsExplanation();
 
   fprintf(stderr,
   "                                                                   \n"
@@ -187,11 +181,10 @@ void PrintMenu(void){
   "           File to compress is the last argument.                  \n"
   "                                                                   \n"
   "COPYRIGHT                                                          \n"
-  "      Copyright (C) 2014-2021, IEETA, University of Aveiro.        \n"
+  "      Copyright (C) 2014-2023.                                     \n"
   "      This is a Free software, under GPLv3. You may redistribute   \n"
   "      copies of it under the terms of the GNU - General Public     \n"
-  "      License v3 <http://www.gnu.org/licenses/gpl.html>. There     \n"
-  "      is NOT ANY WARRANTY, to the extent permitted by law.       \n\n",
+  "      License v3 <http://www.gnu.org/licenses/gpl.html>.         \n\n",
   DEFAULT_HS, DEFAULT_LR);
   }
 
@@ -209,9 +202,11 @@ void PrintVersion(void){
   "                                                                   \n"
   "Extreme lossless compression and decompression of DNA sequences    \n"
   "                                                                   \n"
-  "Copyright (C) 2014-2021 University of Aveiro. JARVIS2 is a Free    \n"
-  "software. Copies may redistributed under the terms of the GNU -    \n"
-  "General Public License v3 http://www.gnu.org/licenses/gpl.html.    \n"
+  "Developed and coded by Diogo Pratas (https://pratas.github.io).    \n"
+  "Copyright (C) 2014-2023, University of Aveiro and University of    \n"
+  "Helsinki. JARVIS2 is a Free software. Copies may be distributed    \n"
+  "under the terms of the GNU-General Public License v3. See site:    \n"
+  "http://www.gnu.org/licenses/gpl.html.                              \n" 
   "There is NOT ANY WARRANTY, to the extent permitted by law.       \n\n", 
   VERSION, RELEASE);
   }
