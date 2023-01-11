@@ -1,6 +1,6 @@
 <p align="center"><img src="imgs/logo.png" 
 alt="JARVIS2" width="300" border="0" /></p>
-<p align="center"><b>High reference-free compression of genomic data</b></p>
+<p align="center"><b>JARVIS2: a data compressor for large genome sequences</b></p>
 
 ### Installation ###
 
