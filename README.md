@@ -259,6 +259,23 @@ Decompression of FASTQ data:
 ./JARVIS2.sh --decompress --fastq --threads 4 --input sample.fq.tar
 </pre>
 
+### Benchmark ###
+
+JARVIS2 has been tested in two large benchmarks, namely the:
+
+1. Human genome (T2T Chm13 version 2.0 [<a href="https://doi.org/10.1126/science.abj6987">article</a>,<a href="https://s3-us-west-2.amazonaws.com/human-pangenomics/T2T/CHM13/assemblies/analysis_set/chm13v2.0.fa.gz">sequence</a>])
+<pre>
+https://github.com/cobilab/HumanGenome
+</pre>
+
+2. Cassava genome (TME 204 [<a href="https://doi.org/10.1093/gigascience/giac028">article</a>,<a href="https://ftp.cngb.org/pub/gigadb/pub/10.5524/102001_103000/102193/00_Assembly_Fasta/haplotigs/TME204.HiFi_HiC.haplotig1.fa">sequence</a>]) 
+<pre>
+https://github.com/cobilab/CassavaGenome
+</pre>
+
+<bold>Performance: </bold>
+Currently, as far as we know, JARVIS2 holds the record on the higher compressibility for both genomes.
+
 ### Citation ###
 
 <pre>
