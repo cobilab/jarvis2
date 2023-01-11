@@ -194,38 +194,39 @@ This will output the following content:
 </pre>
 
 
-#### Compression of FASTA data ####
+#### Compression and decompression of FASTA and FASTQ data ####
 
-Preparing JARVIS2 for FASTA:
+First, make sure to give permitions to the script, by typing the following at the src/ folder
 <pre>
-chmod +x *.sh
+chmod +x JARVIS2.sh
+</pre>
+
+The extension of compressing FASTA and FASTQ data contains a menu to expose the parameters that can be accessed using:
+<pre>
+./JARVIS2.sh --help
+</pre>
+
+Preparing JARVIS2 for FASTA and FASTQ:
+<pre>
 ./JARVIS2.sh --install
 </pre>
 
-Compression:
+Compression of FASTA data:
 <pre>
 ./JARVIS2.sh --threads 8 --fasta --block 10MB --input sample.fa
 </pre>
 
-Decompression:
+Decompression of FASTA data:
 <pre>
 ./JARVIS2.sh --decompress --fasta --threads 4 --input sample.fa.tar
 </pre>
 
-#### Compression of FASTQ data ####
-
-Preparing JARVIS2 for FASTQ:
-<pre>
-chmod +x *.sh
-./JARVIS2.sh --install
-</pre>
-
-Compression:
+Compression of FASTQ data:
 <pre>
 ./JARVIS2.sh --threads 8 --fastq --block 40MB --input sample.fq
 </pre>
 
-Decompression:
+Decompression of FASTQ data:
 <pre>
 ./JARVIS2.sh --decompress --fastq --threads 4 --input sample.fq.tar
 </pre>
