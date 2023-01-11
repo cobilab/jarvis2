@@ -196,7 +196,7 @@ This will output the following content:
 
 #### Compression and decompression of FASTA and FASTQ data ####
 
-First, make sure to give permitions to the script, by typing the following at the src/ folder
+First, make sure to give permitions to the script by typing the following at the src/ folder
 <pre>
 chmod +x JARVIS2.sh
 </pre>
@@ -247,5 +247,4 @@ For any issue let us know at [issues link](https://github.com/cobilab/jarvis2/is
 
 For more information:
 <pre>http://www.gnu.org/licenses/gpl-3.0.html</pre>
-
 
