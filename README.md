@@ -5,7 +5,7 @@ alt="JARVIS2" width="300" border="0" /></p>
 ### Installation ###
 
 <pre>
-git clone https://github.com/cobilab/jarvis2.git
+git clone https://github.com/cobioders/jarvis2.git
 cd jarvis2/src/
 make
 </pre>
