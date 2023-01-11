@@ -5,7 +5,7 @@ alt="JARVIS2" width="300" border="0" /></p>
 ### Installation ###
 
 <pre>
-git clone https://github.com/cobioders/jarvis2.git
+git clone https://github.com/cobilab/jarvis2.git
 cd jarvis2/src/
 make
 </pre>
@@ -100,17 +100,17 @@ Preparing JARVIS2 for FASTA:
 <pre>
 cd FASTA/
 chmod +x *.sh
-./JARVIS2_FASTA --install
+./JARVIS2.sh --install
 </pre>
 
 Compression:
 <pre>
-./JARVIS2_FASTA.sh --threads 8 --block 10MB --input sample.fa
+./JARVIS2.sh --threads 8 --fasta --block 10MB --input sample.fa
 </pre>
 
 Decompression:
 <pre>
-./JARVIS2_FASTA.sh --decompress --threads 4 --input sample.fa.tar
+./JARVIS2.sh --decompress --fasta --threads 4 --input sample.fa.tar
 </pre>
 
 #### Compression of FASTQ data ####
@@ -119,17 +119,17 @@ Preparing JARVIS2 for FASTQ:
 <pre>
 cd FASTQ/
 chmod +x *.sh
-./JARVIS2_FASTQ --install
+./JARVIS2.sh --install
 </pre>
 
 Compression:
 <pre>
-./JARVIS2_FASTQ.sh --threads 8 --block 40MB --input sample.fq
+./JARVIS2.sh --threads 8 --fastq --block 40MB --input sample.fq
 </pre>
 
 Decompression:
 <pre>
-./JARVIS2_FASTQ.sh --decompress --threads 4 --input sample.fq.tar
+./JARVIS2.sh --decompress --fastq --threads 4 --input sample.fq.tar
 </pre>
 
 ### Citation ###
@@ -149,5 +149,4 @@ For any issue let us know at [issues link](https://github.com/cobilab/jarvis2/is
 For more information:
 <pre>http://www.gnu.org/licenses/gpl-3.0.html</pre>
 
-                                                    
 
