@@ -9,6 +9,7 @@
 [![HGR](https://img.shields.io/static/v1.svg?label=Human%20genome&message=compression%20record&color=orange)](#)
 [![CR](https://img.shields.io/static/v1.svg?label=Cassava%20genome&message=compression%20record&color=orange)](#)
 
+<br>
 </div>
 
 <p align="center"><img src="imgs/logo.png" 
