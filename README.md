@@ -5,6 +5,7 @@
 [![Format2](https://img.shields.io/static/v1.svg?label=Format&message=FASTA&color=green)](#)
 [![Format3](https://img.shields.io/static/v1.svg?label=Format&message=FASTQ&color=green)](#)
 [![MX](https://img.shields.io/static/v1.svg?label=Mixing&message=neural%20network&color=yellow)](#)
+<br>
 [![HGR](https://img.shields.io/static/v1.svg?label=Human%20genome&message=compression%20record&color=orange)](#)
 [![CR](https://img.shields.io/static/v1.svg?label=Cassava%20genome&message=compression%20record&color=orange)](#)
 
