@@ -1,3 +1,13 @@
+<div align="center">
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](LICENSE)
+[![Formats](https://img.shields.io/static/v1.svg?label=Formats&message=SEQ-FASTA-FASTQ&color=green)](#)
+[![HGR](https://img.shields.io/static/v1.svg?label=Human%20genome&message=compression%20record&color=orange)](#)
+[![CR](https://img.shields.io/static/v1.svg?label=Cassava%20genome&message=compression%20record&color=orange)](#)
+[![MX](https://img.shields.io/static/v1.svg?label=Mixing&message=neural%20network&color=yellow)](#)
+
+</div>
+
 <p align="center"><img src="imgs/logo.png" 
 alt="JARVIS2" width="300" border="0" /></p>
 <p align="center"><b>JARVIS2: a data compressor for large genome sequences</b></p>
