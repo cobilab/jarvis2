@@ -1,7 +1,9 @@
 <div align="center">
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](LICENSE)
-[![Formats](https://img.shields.io/static/v1.svg?label=Formats&message=SEQ-FASTA-FASTQ&color=green)](#)
+[![Format1](https://img.shields.io/static/v1.svg?label=Format&message=SEQ&color=green)](#)
+[![Format2](https://img.shields.io/static/v1.svg?label=Format&message=FASTA&color=green)](#)
+[![Format3](https://img.shields.io/static/v1.svg?label=Format&message=FASTQ&color=green)](#)
 [![HGR](https://img.shields.io/static/v1.svg?label=Human%20genome&message=compression%20record&color=orange)](#)
 [![CR](https://img.shields.io/static/v1.svg?label=Cassava%20genome&message=compression%20record&color=orange)](#)
 [![MX](https://img.shields.io/static/v1.svg?label=Mixing&message=neural%20network&color=yellow)](#)
