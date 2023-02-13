@@ -34,6 +34,7 @@ void Decompress(Parameters *P, CModel **cModels, uint8_t id){
   FloatPModel *PT;
   CMWeight    *WM;
   uint64_t    i = 0;
+  int64_t     garbagex = 0;
 
   if(P->verbose)
     fprintf(stderr, "Decompressing %"PRIu64" symbols of target %d ...\n", 
@@ -43,7 +44,7 @@ void Decompress(Parameters *P, CModel **cModels, uint8_t id){
   start_decode(Reader);
 
   P[id].watermark        = ReadNBits(       WATERMARK_BITS, Reader);
-  garbage                = ReadNBits(        CHECKSUM_BITS, Reader);
+  garbagex               = ReadNBits(        CHECKSUM_BITS, Reader);
   P[id].size             = ReadNBits(            SIZE_BITS, Reader);
   line_size              = ReadNBits(              LS_BITS, Reader);
   ALPHABET *AL = CreateAlphabet(0);
@@ -218,7 +219,8 @@ int32_t main(int argc, char *argv[]){
   FILE        *Reader = NULL;
   uint8_t     help, verbose, force, nTar = 1;
   clock_t     stop = 0, start = clock();
-  
+  int64_t     garbagex;
+
   if((help = ArgsState(DEFAULT_HELP, p, argc, "-h")) == 1 || argc < 2){
     PrintMenuD();
     return EXIT_SUCCESS;
@@ -256,10 +258,10 @@ int32_t main(int argc, char *argv[]){
       }
     checksum[n]    = ReadNBits(           CHECKSUM_BITS, Reader);
     P[n].size      = ReadNBits(               SIZE_BITS, Reader);
-    garbage        = ReadNBits(                 LS_BITS, Reader);
+    garbagex       = ReadNBits(                 LS_BITS, Reader);
     cardinality    = ReadNBits(        CARDINALITY_BITS, Reader);
     for(k = 0 ; k < cardinality ; ++k)
-      garbage      = ReadNBits(                SYM_BITS,  Reader);
+      garbagex     = ReadNBits(                SYM_BITS,  Reader);
     P[n].nModels   = ReadNBits(           N_MODELS_BITS, Reader);
     P[n].model     = (ModelPar *) Calloc(P[n].nModels, sizeof(ModelPar));
     for(k = 0 ; k < P[n].nModels ; ++k){

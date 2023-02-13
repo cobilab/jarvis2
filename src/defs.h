@@ -65,8 +65,6 @@ typedef struct{
   }
 PARAM;
 
-uint32_t garbage;
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #define RELEASE                1
