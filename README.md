@@ -108,7 +108,7 @@ To see the possible levels (automatic choosen compression parameters), type:
 ./JARVIS2 -s
 </pre>
 
-This will ouput th following pre-set models for each 24 levels:
+This will ouput th following pre-set models for each 25 levels:
 <pre>
 Level 1: -rm 20:12:0.1:0.9:6:0.10:0:0.8:200000 
 Level 2: -rm 200:12:0.1:0.9:6:0.10:0:0.8:200000 -cm 3:1:0:0.7/0:0:0:0 
@@ -134,6 +134,7 @@ Level 21: -rm 100:12:0.1:0.9:6:0.10:1:0.85:200000 -cm 1:1:0:0.8/0:0:0:0 -cm 3:1:
 Level 22: -rm 200:12:0.1:0.9:6:0.10:1:0.85:200000 -cm 1:1:0:0.8/0:0:0:0 -cm 3:1:0:0.93/0:0:0:0 -cm 6:1:1:0.7/0:0:0:0 -cm 13:200:1:0.95/0:0:0:0 
 Level 23: -rm 500:12:0.2:0.9:7:0.1:1:0.01:200000 -cm 1:1:0:0.7/0:0:0:0 -cm 3:1:0:0.9/0:0:0:0 -cm 7:10:1:0.92/0:0:0:0 -cm 12:10:1:0.94/0:0:0:0 
 Level 24: -rm 1000:13:0.2:0.9:7:0.1:1:0.1:200000 -cm 1:1:0:0.7/0:0:0:0 -cm 3:1:0:0.9/0:0:0:0 -cm 7:10:1:0.90/0:0:0:0 -cm 12:20:1:0.95/0:0:0:0 
+Level 25: -lr 0.01 -hs 42 -rm 1000:12:0.1:0.9:7:0.4:1:0.2:220000 -cm 1:1:0:0.7/0:0:0:0 -cm 7:10:1:0.7/0:0:0:0 -cm 12:1:1:0.85/0:0:0:0
 </pre>
 
 To see the meaning of the model parameters, type:
