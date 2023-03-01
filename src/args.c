@@ -103,7 +103,7 @@ RModelPar ArgsUniqRModel(char *str, uint8_t type){
 
     if(m      >  100000  || m      <  1       ||
        ctx    >  MAX_CTX || ctx    <  MIN_CTX ||
-       alpha  >  1       || alpha  <= 0       || 
+       alpha  >  50      || alpha  <= 0       || 
        beta   >= 1       || beta   <= 0       ||
        limit  >  21      || limit  <= 0       ||
        gamma  >= 1       || gamma  <= 0       ||
