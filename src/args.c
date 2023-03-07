@@ -181,7 +181,7 @@ void PrintArgs(PARAM *P){
     }
 
   for(n = 0 ; n < P->nRModels ; ++n){
-    fprintf(stderr, "Repeat model %d:\n", n+1);
+    fprintf(stderr, "Repeat class model %d:\n", n+1);
     fprintf(stderr, "  [+] Maximum number of repeats .... %u\n",
     P->rmodel[n].nr);
     fprintf(stderr, "  [+] Context order ................ %u\n",
