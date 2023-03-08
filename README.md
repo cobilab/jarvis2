@@ -48,7 +48,7 @@ SYNOPSIS
       ./JARVIS2 [OPTION]... [FILE]                                 
                                                                    
 SAMPLE                                                             
-      Run Compression   -> ./JARVIS2 -v -l 4 sequence.txt          
+      Run Compression   -> ./JARVIS2 -v -l 30 sequence.txt          
       Run Decompression -> ./JARVIS2 -v -d sequence.txt.jc         
                                                                    
 DESCRIPTION                                                        
@@ -84,7 +84,7 @@ DESCRIPTION
                                                                    
       -l [NUMBER],  --level [NUMBER]                               
            Compression level (integer).                            
-           Default level: 4.                                      
+           Default level: 30.                                      
            It defines compressibility in balance with computational
            resources (RAM & time). Use -s for levels perception.   
                                                                    
@@ -108,7 +108,7 @@ To see the possible levels (automatic choosen compression parameters), type:
 ./JARVIS2 -s
 </pre>
 
-This will ouput th following pre-set models for each 25 levels:
+This will ouput th following pre-set models for each 33 levels:
 <pre>
 Level 1: -rm 20:12:0.1:0.9:6:0.10:0:0.8:200000 
 Level 2: -rm 200:12:0.1:0.9:6:0.10:0:0.8:200000 -cm 3:1:0:0.7/0:0:0:0 
@@ -134,7 +134,15 @@ Level 21: -rm 100:12:0.1:0.9:6:0.10:1:0.85:200000 -cm 1:1:0:0.8/0:0:0:0 -cm 3:1:
 Level 22: -rm 200:12:0.1:0.9:6:0.10:1:0.85:200000 -cm 1:1:0:0.8/0:0:0:0 -cm 3:1:0:0.93/0:0:0:0 -cm 6:1:1:0.7/0:0:0:0 -cm 13:200:1:0.95/0:0:0:0 
 Level 23: -rm 500:12:0.2:0.9:7:0.1:1:0.01:200000 -cm 1:1:0:0.7/0:0:0:0 -cm 3:1:0:0.9/0:0:0:0 -cm 7:10:1:0.92/0:0:0:0 -cm 12:10:1:0.94/0:0:0:0 
 Level 24: -rm 1000:13:0.2:0.9:7:0.1:1:0.1:200000 -cm 1:1:0:0.7/0:0:0:0 -cm 3:1:0:0.9/0:0:0:0 -cm 7:10:1:0.90/0:0:0:0 -cm 12:20:1:0.95/0:0:0:0 
-Level 25: -lr 0.01 -hs 42 -rm 1000:12:0.1:0.9:7:0.4:1:0.2:220000 -cm 1:1:0:0.7/0:0:0:0 -cm 7:10:1:0.7/0:0:0:0 -cm 12:1:1:0.85/0:0:0:0
+Level 25: -lr 0.01 -hs 42 -rm 1000:12:0.1:0.9:7:0.4:1:0.2:220000 -cm 1:1:0:0.7/0:0:0:0 -cm 7:10:1:0.7/0:0:0:0 -cm 12:1:1:0.85/0:0:0:0 
+Level 26: -lr 0.01 -hs 42 -rm 100:12:0.01:0.9:7:0.8:1:0.2:240000 -cm 1:1:0:0.9/0:0:0:0 -cm 7:10:1:0.9/0:0:0:0 -cm 12:10:1:0.9/0:0:0:0 
+Level 27: -lr 0.05 -hs 42 -rm 100:12:1:0.9:7:0.8:0:0.01:250000 -rm 100:12:1:0.9:7:0.8:2:0.01:240000 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.89/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 
+Level 28: -lr 0.05 -hs 42 -rm 100:12:1:0.9:7:0.8:0:0.01:250000 -rm 100:12:1:0.9:7:0.8:2:0.01:240000 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.89/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 
+Level 29: -lr 0.05 -hs 42 -rm 200:12:1:0.9:7:0.8:0:0.01:250000 -rm 200:12:1:0.9:7:0.8:2:0.01:240000 -cm 1:1:0:0.9/0:0:0:0 -cm 4:1:0:0.9/0:0:0:0 -cm 8:1:1:0.89/0:0:0:0 -cm 12:20:1:0.97/0:0:0:0 
+Level 30: -lr 0.05 -hs 42 -rm 200:12:1:0.9:7:0.8:1:0.01:250000 -cm 4:1:0:0.9/0:0:0:0 
+Level 31: -lr 0.05 -hs 42 -rm 100:12:1:0.9:7:0.8:1:0.01:250000 -cm 3:1:0:0.9/0:0:0:0 
+Level 32: -lr 0.03 -hs 42 -rm 500:12:1:0.9:7:0.8:1:0.01:250000 -cm 3:1:0:0.9/0:0:0:0 
+Level 33: -lr 0.03 -hs 42 -rm 200:12:1:0.9:7:0.8:1:0.01:250000 -cm 7:1:0:0.9/0:0:0:0 
 </pre>
 
 To see the meaning of the model parameters, type:
