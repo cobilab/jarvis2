@@ -116,7 +116,7 @@ void PrintMenu(void){
   "      ./JARVIS2 [OPTION]... [FILE]                                 \n"
   "                                                                   \n"
   "SAMPLE                                                             \n"
-  "      Run Compression   -> ./JARVIS2 -v -l 4 sequence.txt          \n"
+  "      Run Compression   -> ./JARVIS2 -v -l 30 sequence.txt         \n"
   "      Run Decompression -> ./JARVIS2 -v -d sequence.txt.jc         \n"
   "                                                                   \n"
   "DESCRIPTION                                                        \n"
