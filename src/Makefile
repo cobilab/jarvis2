@@ -1,12 +1,12 @@
 #============================================================================#
-#             JARVIS2 2014-2021, IEETA/DETI, UNIVERSITY OF AVEIRO            #
+#             JARVIS2 2014-2023, IEETA/DETI, UNIVERSITY OF AVEIRO            #
 #============================================================================#
 BIN    = .
 CC     = gcc
 CPLP   = 
 #-----------------------------------------------------------------------------
 #CFLAGS = -Wall -O3 -march=native -mtune=native $(CPLP) -DPROGRESS
-CFLAGS = -Wall -O3 $(CPLP) -DPROGRESS
+CFLAGS = -Wall -Ofast $(CPLP) -DPROGRESS
 #-----------------------------------------------------------------------------
 LIBS   = -lm
 DEPS   = defs.h

@@ -727,7 +727,7 @@ int main(int argc, char **argv){
     CLOCKS_PER_SEC); 
 
   fprintf(stderr, "Done!                        \n");  // SPACES ARE VALID!
-  return 0;
+  exit(0);
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
