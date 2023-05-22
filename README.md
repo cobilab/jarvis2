@@ -303,8 +303,10 @@ Currently, as far as we know, JARVIS2 holds the record on the higher compressibi
 ### Citation ###
 
 <pre>
-[JARVIS2: a data compressor for large genome sequences. D Pratas, AJ Pinho. Data Compression Conference (DCC), 288-297, 2023.](https://doi.org/10.1109/DCC55655.2023.00037)
+JARVIS2: a data compressor for large genome sequences. D Pratas, AJ Pinho. Data Compression Conference (DCC), 288-297, 2023.
 </pre>
+
+[PDF Access here](https://doi.org/10.1109/DCC55655.2023.00037)
 
 #### Issues ###
 
