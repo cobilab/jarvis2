@@ -12,7 +12,7 @@
 #include <float.h>
 #include <ctype.h>
 #include <time.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include "defs.h"
@@ -68,7 +68,7 @@ void EncodeHeader(PARAM *P, RCLASS **RC, CMODEL **CM, FILE *F){
     WriteNBits(RC[n]->P->ctx,                            CTX_BITS, F);
     WriteNBits(RC[n]->P->rev,                             IR_BITS, F);
     WriteNBits(RC[n]->P->c_max,                        CACHE_BITS, F);
-    } 
+    }
 
   #ifdef DEBUG
   printf("size    = %"PRIu64"\n", P->size);
@@ -111,10 +111,10 @@ void EncodeHeader(PARAM *P, RCLASS **RC, CMODEL **CM, FILE *F){
 // UPDATE CMODELS
 //
 void UpdateCModels(CMODEL **CM, CBUF *SB, uint8_t sym, uint32_t nCModels){
-  
+
   uint8_t irSym = 0;
-  uint32_t r;	
-  
+  uint32_t r;
+
   for(r = 0 ; r < nCModels ; ++r){
     switch(CM[r]->ir){
       case 0:
@@ -145,8 +145,8 @@ void Compress(PARAM *P, char *fn){
   FILE      *IN  = Fopen(fn, "r"), *OUT = Fopen(Cat(fn, ".jc"), "w");
   uint64_t  i = 0, mSize = MAX_BUF, pos = 0, r = 0;
   uint32_t  m, n, q, j, c;
-  uint8_t   t[NSYM], *buf = (uint8_t *) Calloc(mSize, sizeof(uint8_t)), sym = 0, 
-            *p; 
+  uint8_t   t[NSYM], *buf = (uint8_t *) Calloc(mSize, sizeof(uint8_t)), sym = 0,
+            *p;
 
   RCLASS    **RC;
   CMODEL    **CM;
@@ -161,10 +161,10 @@ void Compress(PARAM *P, char *fn){
 
   if(P->verbose)
     fprintf(stderr, "Analyzing data and creating models ...\n");
- 
+
   if(P->nCModels + P->nRModels < 1){
     fprintf(stderr, "Error: At least one context or one repeat model must be set!\n");
-    exit(1);    
+    exit(1);
     }
 
   #ifdef ESTIMATE
@@ -219,7 +219,7 @@ void Compress(PARAM *P, char *fn){
 
   RC = (RCLASS **) Malloc(P->nRModels * sizeof(RCLASS *));
   for(n = 0 ; n < P->nRModels ; ++n){
-    RC[n] = CreateRC(P->rmodel[n].nr,    P->rmodel[n].alpha,  P->rmodel[n].beta,  
+    RC[n] = CreateRC(P->rmodel[n].nr,    P->rmodel[n].alpha,  P->rmodel[n].beta,
                      P->rmodel[n].limit, P->rmodel[n].ctx,    P->rmodel[n].gamma,
                      P->rmodel[n].ir,    P->rmodel[n].weight, P->rmodel[n].cache);
     }
@@ -245,7 +245,7 @@ void Compress(PARAM *P, char *fn){
 
   while((m = fread(t, sizeof(uint8_t), NSYM, IN)) == NSYM){
     buf[i] = S2N(t[3])|(S2N(t[2])<<2)|(S2N(t[1])<<4)|(S2N(t[0])<<6); // PACK 4
-    
+
     for(n = 0 ; n < m ; ++n){
 
       SB->buf[SB->idx] = sym = S2N(t[n]);
@@ -257,7 +257,7 @@ void Compress(PARAM *P, char *fn){
       for(r = 0 ; r < P->nCModels ; ++r){       // FOR ALL CMODELS
         CMODEL *FCM = CM[r];
         GetPModelIdx(p, FCM);
-        ComputePModel(FCM, PM[c], FCM->pModelIdx, FCM->alphaDen, 
+        ComputePModel(FCM, PM[c], FCM->pModelIdx, FCM->alphaDen,
 	freqs[c], &sums[c]);
         ComputeWeightedFreqs(WM->weight[c], PM[c], PT, NSYM);
         if(FCM->edits != 0){
@@ -265,7 +265,7 @@ void Compress(PARAM *P, char *fn){
           FCM->TM->seq->buf[FCM->TM->seq->idx] = sym;
           FCM->TM->idx = GetPModelIdxCorr(FCM->TM->seq->buf+
           FCM->TM->seq->idx-1, FCM, FCM->TM->idx);
-          ComputePModel(FCM, PM[c], FCM->TM->idx, FCM->TM->den, 
+          ComputePModel(FCM, PM[c], FCM->TM->idx, FCM->TM->den,
 	  freqs[c], &sums[c]);
           ComputeWeightedFreqs(WM->weight[c], PM[c], PT, FCM->nSym);
           }
@@ -291,7 +291,7 @@ void Compress(PARAM *P, char *fn){
         PM[j]->sum = MX_RM[q]->sum;
         ComputeWeightedFreqs(WM->weight[j], PM[j], PT, NSYM);
         }
-     
+
       // FILL PROBABILITIES FOR ALL MODELS FOR NEURAL NETWORK
       for(q = 0 ; q < P->nCPModels ; ++q)
         for(j = 0 ; j < NSYM ; ++j)
@@ -325,7 +325,7 @@ void Compress(PARAM *P, char *fn){
           UpdateTolerantModel(CM[r]->TM, PM[++c], sym);
 
       for(r = 0 ; r < P->nRModels ; ++r){
-	if(RC[r]->P->c_max != 0) 
+	if(RC[r]->P->c_max != 0)
 	  RemoveKmerPos(RC[r], buf);
         UpdateWeights(RC[r], buf, sym);
         }
@@ -336,7 +336,7 @@ void Compress(PARAM *P, char *fn){
     if(++i == mSize)    // REALLOC BUFFER ON OVERFLOW 4 STORE THE COMPLETE SEQ
       buf = (uint8_t *) Realloc(buf, (mSize+=mSize) * sizeof(uint8_t));
 
-    Progress(P->size, i); 
+    Progress(P->size, i);
     }
 
   WriteNBits(m, 8, OUT);
@@ -344,7 +344,7 @@ void Compress(PARAM *P, char *fn){
     WriteNBits(S2N(t[n]), 8, OUT);        // ENCODE REMAINING SYMBOLS
 
   fprintf(stderr, "Done!                                               \n");
-  fprintf(stderr, "Compression: %"PRIu64" -> %"PRIu64" ( %.6g bpb )\n", 
+  fprintf(stderr, "Compression: %"PRIu64" -> %"PRIu64" ( %.6g bpb )\n",
   P->length, (uint64_t) _bytes_output, (double) _bytes_output*8.0 / P->length);
   fprintf(stderr, "Ratio: %6lf\n",  (double) P->length / _bytes_output);
 
@@ -379,7 +379,7 @@ void Decompress(char *fn){
   uint64_t i = 0, mSize = MAX_BUF, pos = 0;
   uint32_t m, n, j, q, r, c;
   uint8_t  *buf = (uint8_t *) Calloc(mSize, sizeof(uint8_t)), sym = 0, *p;
-  RCLASS   **RC = NULL; 
+  RCLASS   **RC = NULL;
   CMODEL   **CM = NULL;
   PARAM    *P = (PARAM *) Calloc(1, sizeof(PARAM));
   PMODEL   **PM;
@@ -554,7 +554,7 @@ void Decompress(char *fn){
 
       sym = ArithDecodeSymbol(NSYM, (int *) MX_CM->freqs, (int) MX_CM->sum, IN);
       SB->buf[SB->idx] = sym;
-      
+
       mix_update_state(mxs, probs, sym, P->lr);
 
       if(n == 0) buf[i] = sym<<6 ; else buf[i] |= (sym<<((3-n)<<1));
@@ -567,7 +567,7 @@ void Decompress(char *fn){
       CalcDecayment(WM, PM, sym);
 
       UpdateCModels(CM, SB, sym, P->nCModels);
-      
+
       RenormalizeWeights(WM);
 
       for(r = 0, c = 0 ; r < P->nCModels ; ++r, ++c)
@@ -576,7 +576,7 @@ void Decompress(char *fn){
 
       for(r = 0 ; r < P->nRModels ; ++r){
         UpdateWeights(RC[r], buf, sym);
-        if(RC[r]->P->c_max != 0) 
+        if(RC[r]->P->c_max != 0)
 	  RemoveKmerPos(RC[r], buf);
         }
 
@@ -610,17 +610,17 @@ void Decompress(char *fn){
   }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// MAIN 
+// MAIN
 //
 int main(int argc, char **argv){
   char       **p = *&argv, **xargv, *xpl = NULL;
   int32_t    n, k, xargc = 0;
   PARAM      *P;
   clock_t    stop = 0, start = clock();
-  
+
   P = (PARAM *) Calloc(1, sizeof(PARAM));
 
-  if((P->help = ArgState(DEFAULT_HELP, p, argc, "-h", "--help")) == 1 || 
+  if((P->help = ArgState(DEFAULT_HELP, p, argc, "-h", "--help")) == 1 ||
   argc < 2){
     PrintMenu();
     return EXIT_SUCCESS;
@@ -644,14 +644,14 @@ int main(int argc, char **argv){
   P->verbose   = ArgState  (DEFAULT_VERBOSE, p, argc, "-v",  "--verbose");
   P->force     = ArgState  (DEFAULT_FORCE,   p, argc, "-f",  "--force");
   P->estim     = ArgState  (0,               p, argc, "-e",  "--estimate");
-  P->hs        = ArgNumber (DEFAULT_HS,      p, argc, "-hs", "--hidden-size", 
+  P->hs        = ArgNumber (DEFAULT_HS,      p, argc, "-hs", "--hidden-size",
 		 1, 999999);
   P->lr        = ArgDouble (DEFAULT_LR,      p, argc, "-lr", "--learning-rate");
-  P->level     = ArgNumber (0,               p, argc, "-l",  "--level", 
+  P->level     = ArgNumber (0,               p, argc, "-l",  "--level",
 		 MIN_LEVEL, MAX_LEVEL);
 
   P->lr = ((int)(P->lr * 65534)) / 65534.0;
-  
+
   for(n = 1 ; n < argc ; ++n){
     if(strcmp(argv[n], "-cm") == 0){
       P->nCModels++;
@@ -708,23 +708,23 @@ int main(int argc, char **argv){
         P->cmodel[k++] = ArgsUniqCModel(xargv[n+1], 0);
     }
 
-  P->mode = ArgState(DEF_MODE,  p, argc, "-d", "--decompress"); 
+  P->mode = ArgState(DEF_MODE,  p, argc, "-d", "--decompress");
   P->tar  = argv[argc-1];
- 
+
   if(!P->mode){
     if(P->verbose) PrintArgs(P);
-    fprintf(stderr, "Compressing ...\n"); 
+    fprintf(stderr, "Compressing ...\n");
     Compress(P, argv[argc-1]);
     }
   else{
-    fprintf(stderr, "Decompressing ...\n"); 
+    fprintf(stderr, "Decompressing ...\n");
     Decompress(argv[argc-1]);
     }
 
   stop = clock();
   if(P->verbose)
-    fprintf(stderr, "Spent %g seconds.\n", ((double)(stop-start)) / 
-    CLOCKS_PER_SEC); 
+    fprintf(stderr, "Spent %g seconds.\n", ((double)(stop-start)) /
+   CLOCKS_PER_SEC);
 
   fprintf(stderr, "Done!                        \n");  // SPACES ARE VALID!
   exit(0);
